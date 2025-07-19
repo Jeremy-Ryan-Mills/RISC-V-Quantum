@@ -7,6 +7,8 @@
 // -----------------------------------------------------------------------------
 `define XLEN            32                // Register & data path width
 `define RESET_ADDR      32'h0000_0000     // Reset vector address
+`define MEM_ADDR_WIDTH  10
+`define MEM_DATA_WIDTH  32
 
 // -----------------------------------------------------------------------------
 // Base ISA opcodes
