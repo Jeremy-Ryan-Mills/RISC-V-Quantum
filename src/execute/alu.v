@@ -19,6 +19,8 @@ module alu (
             4'b0111: result = $signed(operand_a) >>> operand_b[4:0]; // SRA
             4'b1000: result = ($signed(operand_a) < $signed(operand_b)) ? 32'b1 : 32'b0; // SLT
             4'b1001: result = (operand_a < operand_b) ? 32'b1 : 32'b0; // SLTU
+            4'b1010: result = operand_a;
+            4'b1011: result = operand_b;
             default: result = 32'b0;
         endcase
     end

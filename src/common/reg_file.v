@@ -19,3 +19,4 @@ module regfile (
             regs[rd] <= wd;
         end
     end
+endmodule
