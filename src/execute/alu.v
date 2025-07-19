@@ -9,18 +9,18 @@ module alu (
 
     always_comb begin
         case (alu_op)
-            4'b0000: result = operand_a + operand_b;     // ADD
-            4'b0001: result = operand_a - operand_b;     // SUB
-            4'b0010: result = operand_a & operand_b;     // AND
-            4'b0011: result = operand_a | operand_b;     // OR
-            4'b0100: result = operand_a ^ operand_b;     // XOR
-            4'b0101: result = operand_a << operand_b[4:0]; // SLL
-            4'b0110: result = operand_a >> operand_b[4:0]; // SRL
-            4'b0111: result = $signed(operand_a) >>> operand_b[4:0]; // SRA
-            4'b1000: result = ($signed(operand_a) < $signed(operand_b)) ? 32'b1 : 32'b0; // SLT
-            4'b1001: result = (operand_a < operand_b) ? 32'b1 : 32'b0; // SLTU
-            4'b1010: result = operand_a;
-            4'b1011: result = operand_b;
+            ALU_OP_ADD: result = operand_a + operand_b;     // ADD
+            ALU_OP_SUB: result = operand_a - operand_b;     // SUB
+            ALU_OP_AND: result = operand_a & operand_b;     // AND
+            ALU_OP_OR: result = operand_a | operand_b;     // OR
+            ALU_OP_XOR: result = operand_a ^ operand_b;     // XOR
+            ALU_OP_SLL: result = operand_a << operand_b[4:0]; // SLL
+            ALU_OP_SRL: result = operand_a >> operand_b[4:0]; // SRL
+            ALU_OP_SRA: result = $signed(operand_a) >>> operand_b[4:0]; // SRA
+            ALU_OP_SLT: result = ($signed(operand_a) < $signed(operand_b)) ? 32'b1 : 32'b0; // SLT
+            ALU_OP_SLTU: result = (operand_a < operand_b) ? 32'b1 : 32'b0; // SLTU
+            ALU_OP_ID_A: result = operand_a;
+            ALU_OP_ID_B: result = operand_b;
             default: result = 32'b0;
         endcase
     end

@@ -43,4 +43,21 @@
 `define FUNCT7_SRL      7'b0000000
 `define FUNCT7_SRA      7'b0100000
 
+// -----------------------------------------------------------------------------
+// ALU ops for OP
+// -----------------------------------------------------------------------------
+`define ALU_OP_ADD      4'b0000
+`define ALU_OP_SUB      4'b0001
+`define ALU_OP_AND      4'b0010
+`define ALU_OP_OR       4'b0011
+`define ALU_OP_XOR      4'b0100
+`define ALU_OP_SLL      4'b0101
+`define ALU_OP_SRL      4'b0110
+`define ALU_OP_SRA      4'b0111
+`define ALU_OP_SLT      4'b1000
+`define ALU_OP_SLTU     4'b1001
+`define ALU_OP_ID_A     4'b1010
+`define ALU_OP_ID_B     4'b1011
+
+
 `endif // RISCV_DEFINES_VH
