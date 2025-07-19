@@ -17,6 +17,7 @@ module control_unit (
             a_sel    : 1'b0,
             mem_rw   : 1'b0,
             wb_sel   : 2'b00,
+            pc_sel   : 1'b0 
         };
 
         case (opcode)
@@ -96,6 +97,7 @@ module control_unit (
                 ctrl.a_sel = 1'b1;
                 ctrl.alu_op  = `ALU_OP_ADD;
                 ctrl.wb_sel  = 2'b10;   // PC+4
+                ctrl.pc_sel  = 1'b1;
             end
 
             `OPCODE_JALR: begin
@@ -104,6 +106,7 @@ module control_unit (
                 ctrl.a_sel = 1'b0;
                 ctrl.alu_op  = `ALU_OP_ADD;
                 ctrl.wb_sel  = 2'b10;   // PC+4
+                ctrl.pc_sel  = 1'b1;
             end
             `OPCODE_LUI: begin
                 ctrl.reg_wen = 1'b1;

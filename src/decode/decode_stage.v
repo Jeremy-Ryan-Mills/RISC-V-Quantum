@@ -1,5 +1,5 @@
-`include "riscv-defines.vh"
-`include "control_types.vh"
+`include "common/riscv_defines.vh"
+`include "common/control_types.vh"
 
 module decode_stage (
     input  logic [31:0] instr,

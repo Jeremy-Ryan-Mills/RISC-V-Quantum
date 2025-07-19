@@ -4,10 +4,13 @@ module branch_comp (
     input logic clk,
     input logic [31:0] rs1,
     input logic [31:0] rs2,
-    input logic brun,
-    input logic [2:0] funct3,
+    input logic [31:0] instr,
     output logic branch_taken
 );
+
+    logic [2:0] funct3;
+
+    assign funct3 = instr[14:12];
 
     logic [31:0] diff;
 

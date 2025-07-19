@@ -15,7 +15,6 @@ module memory (
         if (mem_rw) begin
             mem[addr[MEM_ADDR_WIDTH-1:0]] <= wdata;
         end
+        rdata <= mem[addr[MEM_ADDR_WIDTH-1:0]];
     end
-
-    assign rdata = mem[addr[MEM_ADDR_WIDTH-1:0]];
 endmodule

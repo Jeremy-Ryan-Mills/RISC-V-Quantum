@@ -7,10 +7,9 @@ module fetch_stage (
     input logic pc_sel,
     input logic [31:0] alu_out,
 
+    output logic [31:0] pc,
     output logic [31:0] instr
 );
-
-    logic [31:0] pc;
 
     pc pc_inst (
         .clk(clk),

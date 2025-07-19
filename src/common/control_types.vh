@@ -6,4 +6,5 @@ typedef struct packed {
     logic        a_sel;       // 0: reg, 1: PC (for A input to ALU)
     logic        mem_rw;     
     logic [1:0]  wb_sel;      // 0: mem, 1: alu, 2: pc+4
+    logic        pc_sel;      // 0: pc+4, 1: alu_out (for branches/jumps)
 } control_signals_t;
