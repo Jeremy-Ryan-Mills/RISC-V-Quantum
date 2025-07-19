@@ -1,5 +1,6 @@
+`include "common/riscv_defines.vh"
 
-module wb_mux(
+module writeback_mux(
     input logic [31:0] alu_out,
     input logic [31:0] pc_plus_four,
     input logic [31:0] mem_out,
