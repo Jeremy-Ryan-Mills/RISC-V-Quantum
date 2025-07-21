@@ -8,6 +8,7 @@ module core (
 );
 
     logic [31:0] pc;
+    logic pc_sel_final;
     logic [31:0] alu_out;
     logic [31:0] instr;
     logic [31:0] rv1;
@@ -19,6 +20,7 @@ module core (
     control_signals_t ctrl;
     logic [31:0] writeback_result;
     logic [31:0] mem_out;
+    logic branch_taken;
 
     // ----------------------------
     // FETCH STAGE
@@ -26,7 +28,7 @@ module core (
     fetch_stage fetch_stage_inst (
         .clk(clk),
         .reset(reset),
-        .pc_sel(pc_sel),
+        .pc_sel(pc_sel_final),
         .alu_out(alu_out),
         .pc(pc),
         .instr(instr)
@@ -50,6 +52,7 @@ module core (
     // ----------------------------
     reg_file reg_file_inst (
         .clk(clk),
+        .reset(reset),
         .we(ctrl.reg_wen),
         .rs1(rs1),
         .rs2(rs2),
@@ -72,25 +75,29 @@ module core (
     end
 
     alu alu_inst (
-        .a(alu_a),
-        .b(alu_b),
+        .operand_a(alu_a),
+        .operand_b(alu_b),
         .alu_op(ctrl.alu_op),
         .result(alu_out)
     );
 
     branch_comp branch_comp_inst (
+        .clk(clk),
+        .reset(reset),
         .rs1(rv1),
         .rs2(rv2),
         .instr(instr),
         .branch_taken(branch_taken)
     );
 
-    assign ctrl.pc_sel = branch_taken & (instr[6:0] != `OPCODE_BRANCH);
+    assign pc_sel_final = ctrl.pc_sel & (branch_taken | (instr[6:0] != `OPCODE_BRANCH));
+
     // ----------------------------
     // MEMORY STAGE
     // ----------------------------
     memory memory_inst (
         .clk(clk),
+        .reset(reset),
         .addr(alu_out),
         .wdata(rv2),
         .mem_rw(ctrl.mem_rw),
@@ -101,11 +108,11 @@ module core (
     // WRITEBACK STAGE
     // ----------------------------
     writeback_mux writeback_mux_inst (
-        .alu_result(alu_out),
-        .mem_result(mem_out),
-        .pc_plus_4(pc + 4),
+        .alu_out(alu_out),
+        .mem_out(mem_out),
+        .pc_plus_four(pc + 4),
         .wb_sel(ctrl.wb_sel),
-        .result(writeback_result)
+        .reg_out(writeback_result)
     );
 
 endmodule

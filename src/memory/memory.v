@@ -2,6 +2,7 @@
 
 module memory (
     input logic clk,
+    input logic reset,
     input logic [31:0] addr,
     input logic [MEM_DATA_WIDTH-1:0] wdata,
     input logic mem_rw,
@@ -12,9 +13,14 @@ module memory (
     logic [MEM_DATA_WIDTH-1:0] mem [0:2**MEM_ADDR_WIDTH-1];
 
     always_ff @(posedge clk) begin
-        if (mem_rw) begin
-            mem[addr[MEM_ADDR_WIDTH-1:0]] <= wdata;
+        if (reset) begin
+            rdata <= 32'b0;
         end
-        rdata <= mem[addr[MEM_ADDR_WIDTH-1:0]];
+        else begin
+            if (mem_rw) begin
+                mem[addr[MEM_ADDR_WIDTH-1:0]] <= wdata;
+            end
+            rdata <= mem[addr[MEM_ADDR_WIDTH-1:0]];
+        end
     end
 endmodule
