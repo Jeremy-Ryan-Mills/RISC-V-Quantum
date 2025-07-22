@@ -1,6 +1,9 @@
 <testsuites name="results">
   <testsuite name="all" package="all">
-    <property name="random_seed" value="1753155807" />
-    <testcase name="test_core" classname="test_core" file="/home/jeremymills/Desktop/RISC-V-Quantum/sim/test_core.py" lineno="6" time="0.0014443397521972656" sim_time_ns="110.001" ratio_time="76160.05848530869" />
+    <property name="random_seed" value="1753158024" />
+    <testcase name="test_core" classname="test_core" file="/home/jeremymills/Desktop/RISC-V-Quantum/sim/test_core.py" lineno="6" time="0.0014605522155761719" sim_time_ns="110.001" ratio_time="75314.66443095006" />
+    <testcase name="test_addi_add" classname="test_core" file="/home/jeremymills/Desktop/RISC-V-Quantum/sim/test_core.py" lineno="21" time="0.0009140968322753906" sim_time_ns="110.001" ratio_time="120338.45443505478">
+      <failure message="Test failed with RANDOM_SEED=1753158024" />
+    </testcase>
   </testsuite>
 </testsuites>

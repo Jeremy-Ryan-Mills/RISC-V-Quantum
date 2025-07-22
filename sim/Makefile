@@ -20,7 +20,14 @@ SIM = verilator
 
 # Optional include path
 EXTRA_ARGS += -I../src
-VERILATOR_FLAGS += --sv
+VERILATOR_TRACE = 1
 WAVES = 1
+VERILATOR_FLAGS += --sv --trace --trace-structs --trace-fst
+
+all: fst
+fst: sim
+	mv dump.fst $(TOPLEVEL).fst
+	printf "\a\a\a"
+
 
 include $(shell cocotb-config --makefiles)/Makefile.sim
