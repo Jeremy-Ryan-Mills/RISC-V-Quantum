@@ -1,5 +1,5 @@
 `include "common/riscv_defines.vh"
-`include "control_types.vh"
+`include "common/control_types.vh"
 
 module core (
     input logic clk,

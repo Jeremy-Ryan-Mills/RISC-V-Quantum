@@ -7,9 +7,9 @@ module instruction_mem_if (
     output logic [31:0] instr
 );
 
-    logic [31:0] mem [0:2**MEM_ADDR_WIDTH-1];
+    logic [31:0] mem [0:2**`MEM_ADDR_WIDTH-1];
 
     always_ff @(posedge clk) begin
-        instr <= mem[pc[MEM_ADDR_WIDTH-1:0]];
+        instr <= mem[pc[`MEM_ADDR_WIDTH-1:0]];
     end
 endmodule

@@ -21,7 +21,7 @@ module fetch_stage (
 
     instruction_mem_if instruction_mem_if_inst (
         .clk(clk),
-        .PC(pc),
+        .pc(pc),
         .instr(instr)
     );
 endmodule

@@ -1,4 +1,5 @@
 `include "common/riscv_defines.vh"
+`include "common/control_types.vh"
 
 module control_unit (
     input  logic [6:0] opcode,

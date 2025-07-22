@@ -23,13 +23,13 @@ module branch_comp (
         end
         else begin
             case(funct3)
-                `FUNCT3_BEQ: branch_taken = (diff == 0);
-                `FUNCT3_BNE: branch_taken = (diff != 0);
-                `FUNCT3_BLT: branch_taken = (diff < 0);
-                `FUNCT3_BGE: branch_taken = (diff >= 0);
-                `FUNCT3_BLTU: branch_taken = (rs1 < rs2);
-                `FUNCT3_BGEU: branch_taken = (rs1 >= rs2);
-                default: branch_taken = 0;
+                `FUNCT3_BEQ: branch_taken <= ($signed(diff) == 0);
+                `FUNCT3_BNE: branch_taken <= ($signed(diff) != 0);
+                `FUNCT3_BLT: branch_taken <= ($signed(diff) < 0);
+                `FUNCT3_BGE: branch_taken <= ($signed(diff) >= 0);
+                `FUNCT3_BLTU: branch_taken <= (rs1 < rs2);
+                `FUNCT3_BGEU: branch_taken <= (rs1 >= rs2);
+                default: branch_taken <= 0;
             endcase
         end
     end
