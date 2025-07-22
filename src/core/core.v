@@ -3,8 +3,10 @@
 
 module core (
     input logic clk,
-    input logic reset
-
+    input logic reset,
+    input logic sim_load_en,
+    input logic [`MEM_ADDR_WIDTH-1:0] sim_addr,
+    input logic [31:0] sim_data
 );
 
     logic [31:0] pc;
@@ -30,6 +32,9 @@ module core (
         .reset(reset),
         .pc_sel(pc_sel_final),
         .alu_out(alu_out),
+        .sim_load_en(sim_load_en),
+        .sim_addr(sim_addr),
+        .sim_data(sim_data),
         .pc(pc),
         .instr(instr)
     );

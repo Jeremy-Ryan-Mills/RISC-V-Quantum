@@ -16,11 +16,14 @@ module reg_file (
         if (reset) begin
             rv1 <= 32'b0;
             rv2 <= 32'b0;
+        end else begin
+            rv1 <= (rs1 == 0) ? 32'b0 :
+                (rs1 == rd && we && rd != 0) ? wd : regs[rs1];
+
+            rv2 <= (rs2 == 0) ? 32'b0 :
+                (rs2 == rd && we && rd != 0) ? wd : regs[rs2];
         end
-        else begin
-            rv1 <= (rs1 == 0) ? 32'b0 : regs[rs1];
-            rv2 <= (rs2 == 0) ? 32'b0 : regs[rs2];
-        end
+
         if (we && rd != 0) begin
             regs[rd] <= wd;
         end

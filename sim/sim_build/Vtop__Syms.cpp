@@ -72,6 +72,9 @@ Vtop__Syms::Vtop__Syms(VerilatedContext* contextp, const char* namep, Vtop* mode
     for (int __Vfinal = 0; __Vfinal < 2; ++__Vfinal) {
         __Vscope_TOP.varInsert(__Vfinal,"clk", &(TOP.clk), false, VLVT_UINT8,VLVD_IN|VLVF_PUB_RW,0);
         __Vscope_TOP.varInsert(__Vfinal,"reset", &(TOP.reset), false, VLVT_UINT8,VLVD_IN|VLVF_PUB_RW,0);
+        __Vscope_TOP.varInsert(__Vfinal,"sim_addr", &(TOP.sim_addr), false, VLVT_UINT16,VLVD_IN|VLVF_PUB_RW,1 ,9,0);
+        __Vscope_TOP.varInsert(__Vfinal,"sim_data", &(TOP.sim_data), false, VLVT_UINT32,VLVD_IN|VLVF_PUB_RW,1 ,31,0);
+        __Vscope_TOP.varInsert(__Vfinal,"sim_load_en", &(TOP.sim_load_en), false, VLVT_UINT8,VLVD_IN|VLVF_PUB_RW,0);
         __Vscope_core.varInsert(__Vfinal,"alu_a", &(TOP.core__DOT__alu_a), false, VLVT_UINT32,VLVD_NODIR|VLVF_PUB_RW,1 ,31,0);
         __Vscope_core.varInsert(__Vfinal,"alu_b", &(TOP.core__DOT__alu_b), false, VLVT_UINT32,VLVD_NODIR|VLVF_PUB_RW,1 ,31,0);
         __Vscope_core.varInsert(__Vfinal,"alu_out", &(TOP.core__DOT__alu_out), false, VLVT_UINT32,VLVD_NODIR|VLVF_PUB_RW,1 ,31,0);
@@ -89,6 +92,9 @@ Vtop__Syms::Vtop__Syms(VerilatedContext* contextp, const char* namep, Vtop* mode
         __Vscope_core.varInsert(__Vfinal,"rs2", &(TOP.core__DOT__rs2), false, VLVT_UINT8,VLVD_NODIR|VLVF_PUB_RW,1 ,4,0);
         __Vscope_core.varInsert(__Vfinal,"rv1", &(TOP.core__DOT__rv1), false, VLVT_UINT32,VLVD_NODIR|VLVF_PUB_RW,1 ,31,0);
         __Vscope_core.varInsert(__Vfinal,"rv2", &(TOP.core__DOT__rv2), false, VLVT_UINT32,VLVD_NODIR|VLVF_PUB_RW,1 ,31,0);
+        __Vscope_core.varInsert(__Vfinal,"sim_addr", &(TOP.core__DOT__sim_addr), false, VLVT_UINT16,VLVD_NODIR|VLVF_PUB_RW,1 ,9,0);
+        __Vscope_core.varInsert(__Vfinal,"sim_data", &(TOP.core__DOT__sim_data), false, VLVT_UINT32,VLVD_NODIR|VLVF_PUB_RW,1 ,31,0);
+        __Vscope_core.varInsert(__Vfinal,"sim_load_en", &(TOP.core__DOT__sim_load_en), false, VLVT_UINT8,VLVD_NODIR|VLVF_PUB_RW,0);
         __Vscope_core.varInsert(__Vfinal,"writeback_result", &(TOP.core__DOT__writeback_result), false, VLVT_UINT32,VLVD_NODIR|VLVF_PUB_RW,1 ,31,0);
         __Vscope_core__alu_inst.varInsert(__Vfinal,"alu_op", &(TOP.core__DOT__alu_inst__DOT__alu_op), false, VLVT_UINT8,VLVD_NODIR|VLVF_PUB_RW,1 ,3,0);
         __Vscope_core__alu_inst.varInsert(__Vfinal,"operand_a", &(TOP.core__DOT__alu_inst__DOT__operand_a), false, VLVT_UINT32,VLVD_NODIR|VLVF_PUB_RW,1 ,31,0);
@@ -129,10 +135,16 @@ Vtop__Syms::Vtop__Syms(VerilatedContext* contextp, const char* namep, Vtop* mode
         __Vscope_core__fetch_stage_inst.varInsert(__Vfinal,"pc", &(TOP.core__DOT__fetch_stage_inst__DOT__pc), false, VLVT_UINT32,VLVD_NODIR|VLVF_PUB_RW,1 ,31,0);
         __Vscope_core__fetch_stage_inst.varInsert(__Vfinal,"pc_sel", &(TOP.core__DOT__fetch_stage_inst__DOT__pc_sel), false, VLVT_UINT8,VLVD_NODIR|VLVF_PUB_RW,0);
         __Vscope_core__fetch_stage_inst.varInsert(__Vfinal,"reset", &(TOP.core__DOT__fetch_stage_inst__DOT__reset), false, VLVT_UINT8,VLVD_NODIR|VLVF_PUB_RW,0);
+        __Vscope_core__fetch_stage_inst.varInsert(__Vfinal,"sim_addr", &(TOP.core__DOT__fetch_stage_inst__DOT__sim_addr), false, VLVT_UINT16,VLVD_NODIR|VLVF_PUB_RW,1 ,9,0);
+        __Vscope_core__fetch_stage_inst.varInsert(__Vfinal,"sim_data", &(TOP.core__DOT__fetch_stage_inst__DOT__sim_data), false, VLVT_UINT32,VLVD_NODIR|VLVF_PUB_RW,1 ,31,0);
+        __Vscope_core__fetch_stage_inst.varInsert(__Vfinal,"sim_load_en", &(TOP.core__DOT__fetch_stage_inst__DOT__sim_load_en), false, VLVT_UINT8,VLVD_NODIR|VLVF_PUB_RW,0);
         __Vscope_core__fetch_stage_inst__instruction_mem_if_inst.varInsert(__Vfinal,"clk", &(TOP.core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__clk), false, VLVT_UINT8,VLVD_NODIR|VLVF_PUB_RW,0);
         __Vscope_core__fetch_stage_inst__instruction_mem_if_inst.varInsert(__Vfinal,"instr", &(TOP.core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__instr), false, VLVT_UINT32,VLVD_NODIR|VLVF_PUB_RW,1 ,31,0);
         __Vscope_core__fetch_stage_inst__instruction_mem_if_inst.varInsert(__Vfinal,"mem", &(TOP.core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__mem), false, VLVT_UINT32,VLVD_NODIR|VLVF_PUB_RW,2 ,31,0 ,0,1023);
         __Vscope_core__fetch_stage_inst__instruction_mem_if_inst.varInsert(__Vfinal,"pc", &(TOP.core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__pc), false, VLVT_UINT32,VLVD_NODIR|VLVF_PUB_RW,1 ,31,0);
+        __Vscope_core__fetch_stage_inst__instruction_mem_if_inst.varInsert(__Vfinal,"sim_addr", &(TOP.core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__sim_addr), false, VLVT_UINT16,VLVD_NODIR|VLVF_PUB_RW,1 ,9,0);
+        __Vscope_core__fetch_stage_inst__instruction_mem_if_inst.varInsert(__Vfinal,"sim_data", &(TOP.core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__sim_data), false, VLVT_UINT32,VLVD_NODIR|VLVF_PUB_RW,1 ,31,0);
+        __Vscope_core__fetch_stage_inst__instruction_mem_if_inst.varInsert(__Vfinal,"sim_load_en", &(TOP.core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__sim_load_en), false, VLVT_UINT8,VLVD_NODIR|VLVF_PUB_RW,0);
         __Vscope_core__fetch_stage_inst__pc_inst.varInsert(__Vfinal,"alu_out", &(TOP.core__DOT__fetch_stage_inst__DOT__pc_inst__DOT__alu_out), false, VLVT_UINT32,VLVD_NODIR|VLVF_PUB_RW,1 ,31,0);
         __Vscope_core__fetch_stage_inst__pc_inst.varInsert(__Vfinal,"clk", &(TOP.core__DOT__fetch_stage_inst__DOT__pc_inst__DOT__clk), false, VLVT_UINT8,VLVD_NODIR|VLVF_PUB_RW,0);
         __Vscope_core__fetch_stage_inst__pc_inst.varInsert(__Vfinal,"pc", &(TOP.core__DOT__fetch_stage_inst__DOT__pc_inst__DOT__pc), false, VLVT_UINT32,VLVD_NODIR|VLVF_PUB_RW,1 ,31,0);

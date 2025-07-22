@@ -160,8 +160,14 @@ VL_ATTR_COLD void Vtop___024root___ctor_var_reset(Vtop___024root* vlSelf) {
     // Body
     vlSelf->clk = VL_RAND_RESET_I(1);
     vlSelf->reset = VL_RAND_RESET_I(1);
+    vlSelf->sim_load_en = VL_RAND_RESET_I(1);
+    vlSelf->sim_addr = VL_RAND_RESET_I(10);
+    vlSelf->sim_data = VL_RAND_RESET_I(32);
     vlSelf->core__DOT__clk = VL_RAND_RESET_I(1);
     vlSelf->core__DOT__reset = VL_RAND_RESET_I(1);
+    vlSelf->core__DOT__sim_load_en = VL_RAND_RESET_I(1);
+    vlSelf->core__DOT__sim_addr = VL_RAND_RESET_I(10);
+    vlSelf->core__DOT__sim_data = VL_RAND_RESET_I(32);
     vlSelf->core__DOT__pc = VL_RAND_RESET_I(32);
     vlSelf->core__DOT__pc_sel_final = VL_RAND_RESET_I(1);
     vlSelf->core__DOT__alu_out = VL_RAND_RESET_I(32);
@@ -182,6 +188,9 @@ VL_ATTR_COLD void Vtop___024root___ctor_var_reset(Vtop___024root* vlSelf) {
     vlSelf->core__DOT__fetch_stage_inst__DOT__reset = VL_RAND_RESET_I(1);
     vlSelf->core__DOT__fetch_stage_inst__DOT__pc_sel = VL_RAND_RESET_I(1);
     vlSelf->core__DOT__fetch_stage_inst__DOT__alu_out = VL_RAND_RESET_I(32);
+    vlSelf->core__DOT__fetch_stage_inst__DOT__sim_load_en = VL_RAND_RESET_I(1);
+    vlSelf->core__DOT__fetch_stage_inst__DOT__sim_addr = VL_RAND_RESET_I(10);
+    vlSelf->core__DOT__fetch_stage_inst__DOT__sim_data = VL_RAND_RESET_I(32);
     vlSelf->core__DOT__fetch_stage_inst__DOT__pc = VL_RAND_RESET_I(32);
     vlSelf->core__DOT__fetch_stage_inst__DOT__instr = VL_RAND_RESET_I(32);
     vlSelf->core__DOT__fetch_stage_inst__DOT__pc_inst__DOT__clk = VL_RAND_RESET_I(1);
@@ -192,6 +201,9 @@ VL_ATTR_COLD void Vtop___024root___ctor_var_reset(Vtop___024root* vlSelf) {
     vlSelf->core__DOT__fetch_stage_inst__DOT__pc_inst__DOT__pc_next = VL_RAND_RESET_I(32);
     vlSelf->core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__clk = VL_RAND_RESET_I(1);
     vlSelf->core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__pc = VL_RAND_RESET_I(32);
+    vlSelf->core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__sim_load_en = VL_RAND_RESET_I(1);
+    vlSelf->core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__sim_addr = VL_RAND_RESET_I(10);
+    vlSelf->core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__sim_data = VL_RAND_RESET_I(32);
     vlSelf->core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__instr = VL_RAND_RESET_I(32);
     for (int __Vi0 = 0; __Vi0 < 1024; ++__Vi0) {
         vlSelf->core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__mem[__Vi0] = VL_RAND_RESET_I(32);

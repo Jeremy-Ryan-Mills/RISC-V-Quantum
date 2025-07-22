@@ -16,6 +16,9 @@ VL_INLINE_OPT void Vtop___024root___ico_sequent__TOP__0(Vtop___024root* vlSelf) 
     vlSelf->core__DOT__branch_comp_inst__DOT__diff 
         = (vlSelf->core__DOT__reg_file_inst__DOT__rv1 
            - vlSelf->core__DOT__reg_file_inst__DOT__rv2);
+    vlSelf->core__DOT__sim_load_en = vlSelf->sim_load_en;
+    vlSelf->core__DOT__sim_addr = vlSelf->sim_addr;
+    vlSelf->core__DOT__sim_data = vlSelf->sim_data;
     vlSelf->core__DOT__rs1 = (0x1fU & (vlSelf->core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__instr 
                                        >> 0xfU));
     vlSelf->core__DOT__rs2 = (0x1fU & (vlSelf->core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__instr 
@@ -37,6 +40,12 @@ VL_INLINE_OPT void Vtop___024root___ico_sequent__TOP__0(Vtop___024root* vlSelf) 
                  >> 0xcU));
     vlSelf->core__DOT__decode_stage_inst__DOT__opcode 
         = (0x7fU & vlSelf->core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__instr);
+    vlSelf->core__DOT__fetch_stage_inst__DOT__sim_load_en 
+        = vlSelf->core__DOT__sim_load_en;
+    vlSelf->core__DOT__fetch_stage_inst__DOT__sim_addr 
+        = vlSelf->core__DOT__sim_addr;
+    vlSelf->core__DOT__fetch_stage_inst__DOT__sim_data 
+        = vlSelf->core__DOT__sim_data;
     vlSelf->core__DOT__reg_file_inst__DOT__rs1 = vlSelf->core__DOT__rs1;
     vlSelf->core__DOT__decode_stage_inst__DOT__rs1 
         = vlSelf->core__DOT__rs1;
@@ -443,6 +452,12 @@ VL_INLINE_OPT void Vtop___024root___ico_sequent__TOP__0(Vtop___024root* vlSelf) 
         vlSelf->core__DOT__decode_stage_inst__DOT__decoder_i__DOT__imm = 0U;
         vlSelf->core__DOT__decode_stage_inst__DOT__ctrl_i__DOT__ctrl = 0U;
     }
+    vlSelf->core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__sim_load_en 
+        = vlSelf->core__DOT__fetch_stage_inst__DOT__sim_load_en;
+    vlSelf->core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__sim_addr 
+        = vlSelf->core__DOT__fetch_stage_inst__DOT__sim_addr;
+    vlSelf->core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__sim_data 
+        = vlSelf->core__DOT__fetch_stage_inst__DOT__sim_data;
     vlSelf->core__DOT__fetch_stage_inst__DOT__pc_inst__DOT__reset 
         = vlSelf->core__DOT__fetch_stage_inst__DOT__reset;
     vlSelf->core__DOT__fetch_stage_inst__DOT__pc_inst__DOT__clk 
@@ -626,6 +641,12 @@ VL_INLINE_OPT void Vtop___024root___nba_sequent__TOP__0(Vtop___024root* vlSelf) 
     Vtop__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vtop___024root___nba_sequent__TOP__0\n"); );
     // Init
+    SData/*9:0*/ __Vdlyvdim0__core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__mem__v0;
+    __Vdlyvdim0__core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__mem__v0 = 0;
+    IData/*31:0*/ __Vdlyvval__core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__mem__v0;
+    __Vdlyvval__core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__mem__v0 = 0;
+    CData/*0:0*/ __Vdlyvset__core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__mem__v0;
+    __Vdlyvset__core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__mem__v0 = 0;
     CData/*4:0*/ __Vdlyvdim0__core__DOT__reg_file_inst__DOT__regs__v0;
     __Vdlyvdim0__core__DOT__reg_file_inst__DOT__regs__v0 = 0;
     IData/*31:0*/ __Vdlyvval__core__DOT__reg_file_inst__DOT__regs__v0;
@@ -639,8 +660,16 @@ VL_INLINE_OPT void Vtop___024root___nba_sequent__TOP__0(Vtop___024root* vlSelf) 
     CData/*0:0*/ __Vdlyvset__core__DOT__memory_inst__DOT__mem__v0;
     __Vdlyvset__core__DOT__memory_inst__DOT__mem__v0 = 0;
     // Body
+    __Vdlyvset__core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__mem__v0 = 0U;
     __Vdlyvset__core__DOT__reg_file_inst__DOT__regs__v0 = 0U;
     __Vdlyvset__core__DOT__memory_inst__DOT__mem__v0 = 0U;
+    if (vlSelf->sim_load_en) {
+        __Vdlyvval__core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__mem__v0 
+            = vlSelf->sim_data;
+        __Vdlyvset__core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__mem__v0 = 1U;
+        __Vdlyvdim0__core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__mem__v0 
+            = vlSelf->sim_addr;
+    }
     if ((((IData)(vlSelf->core__DOT__decode_stage_inst__DOT__ctrl_i__DOT__ctrl) 
           >> 0xbU) & (0U != (IData)(vlSelf->core__DOT__rd)))) {
         __Vdlyvval__core__DOT__reg_file_inst__DOT__regs__v0 
@@ -668,12 +697,22 @@ VL_INLINE_OPT void Vtop___024root___nba_sequent__TOP__0(Vtop___024root* vlSelf) 
             [(0x3ffU & vlSelf->core__DOT__alu_out)];
         vlSelf->core__DOT__reg_file_inst__DOT__rv1 
             = ((0U == (IData)(vlSelf->core__DOT__rs1))
-                ? 0U : vlSelf->core__DOT__reg_file_inst__DOT__regs
-               [vlSelf->core__DOT__rs1]);
+                ? 0U : (((((IData)(vlSelf->core__DOT__rs1) 
+                           == (IData)(vlSelf->core__DOT__rd)) 
+                          & ((IData)(vlSelf->core__DOT__decode_stage_inst__DOT__ctrl_i__DOT__ctrl) 
+                             >> 0xbU)) & (0U != (IData)(vlSelf->core__DOT__rd)))
+                         ? vlSelf->core__DOT__writeback_result
+                         : vlSelf->core__DOT__reg_file_inst__DOT__regs
+                        [vlSelf->core__DOT__rs1]));
         vlSelf->core__DOT__reg_file_inst__DOT__rv2 
             = ((0U == (IData)(vlSelf->core__DOT__rs2))
-                ? 0U : vlSelf->core__DOT__reg_file_inst__DOT__regs
-               [vlSelf->core__DOT__rs2]);
+                ? 0U : (((((IData)(vlSelf->core__DOT__rs2) 
+                           == (IData)(vlSelf->core__DOT__rd)) 
+                          & ((IData)(vlSelf->core__DOT__decode_stage_inst__DOT__ctrl_i__DOT__ctrl) 
+                             >> 0xbU)) & (0U != (IData)(vlSelf->core__DOT__rd)))
+                         ? vlSelf->core__DOT__writeback_result
+                         : vlSelf->core__DOT__reg_file_inst__DOT__regs
+                        [vlSelf->core__DOT__rs2]));
     }
     vlSelf->core__DOT__branch_comp_inst__DOT__branch_taken 
         = ((1U & (~ (IData)(vlSelf->reset))) && ((4U 
@@ -710,9 +749,11 @@ VL_INLINE_OPT void Vtop___024root___nba_sequent__TOP__0(Vtop___024root* vlSelf) 
                                                        : 
                                                       (0U 
                                                        == vlSelf->core__DOT__branch_comp_inst__DOT__diff)))));
-    vlSelf->core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__instr 
-        = vlSelf->core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__mem
-        [(0x3ffU & vlSelf->core__DOT__pc)];
+    if ((1U & (~ (IData)(vlSelf->sim_load_en)))) {
+        vlSelf->core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__instr 
+            = vlSelf->core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__mem
+            [(0x3ffU & vlSelf->core__DOT__pc)];
+    }
     if (__Vdlyvset__core__DOT__memory_inst__DOT__mem__v0) {
         vlSelf->core__DOT__memory_inst__DOT__mem[__Vdlyvdim0__core__DOT__memory_inst__DOT__mem__v0] 
             = __Vdlyvval__core__DOT__memory_inst__DOT__mem__v0;
@@ -721,13 +762,17 @@ VL_INLINE_OPT void Vtop___024root___nba_sequent__TOP__0(Vtop___024root* vlSelf) 
         vlSelf->core__DOT__reg_file_inst__DOT__regs[__Vdlyvdim0__core__DOT__reg_file_inst__DOT__regs__v0] 
             = __Vdlyvval__core__DOT__reg_file_inst__DOT__regs__v0;
     }
+    if (__Vdlyvset__core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__mem__v0) {
+        vlSelf->core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__mem[__Vdlyvdim0__core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__mem__v0] 
+            = __Vdlyvval__core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__mem__v0;
+    }
     vlSelf->core__DOT__mem_out = vlSelf->core__DOT__memory_inst__DOT__rdata;
+    vlSelf->core__DOT__branch_taken = vlSelf->core__DOT__branch_comp_inst__DOT__branch_taken;
     vlSelf->core__DOT__rv1 = vlSelf->core__DOT__reg_file_inst__DOT__rv1;
     vlSelf->core__DOT__branch_comp_inst__DOT__diff 
         = (vlSelf->core__DOT__reg_file_inst__DOT__rv1 
            - vlSelf->core__DOT__reg_file_inst__DOT__rv2);
     vlSelf->core__DOT__rv2 = vlSelf->core__DOT__reg_file_inst__DOT__rv2;
-    vlSelf->core__DOT__branch_taken = vlSelf->core__DOT__branch_comp_inst__DOT__branch_taken;
     vlSelf->core__DOT__rs1 = (0x1fU & (vlSelf->core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__instr 
                                        >> 0xfU));
     vlSelf->core__DOT__rs2 = (0x1fU & (vlSelf->core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__instr 
@@ -1428,5 +1473,9 @@ void Vtop___024root___eval_debug_assertions(Vtop___024root* vlSelf) {
         Verilated::overWidthError("clk");}
     if (VL_UNLIKELY((vlSelf->reset & 0xfeU))) {
         Verilated::overWidthError("reset");}
+    if (VL_UNLIKELY((vlSelf->sim_load_en & 0xfeU))) {
+        Verilated::overWidthError("sim_load_en");}
+    if (VL_UNLIKELY((vlSelf->sim_addr & 0xfc00U))) {
+        Verilated::overWidthError("sim_addr");}
 }
 #endif  // VL_DEBUG

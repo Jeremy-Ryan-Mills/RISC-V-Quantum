@@ -12,6 +12,9 @@ Vtop::Vtop(VerilatedContext* _vcontextp__, const char* _vcname__)
     , vlSymsp{new Vtop__Syms(contextp(), _vcname__, this)}
     , clk{vlSymsp->TOP.clk}
     , reset{vlSymsp->TOP.reset}
+    , sim_load_en{vlSymsp->TOP.sim_load_en}
+    , sim_addr{vlSymsp->TOP.sim_addr}
+    , sim_data{vlSymsp->TOP.sim_data}
     , rootp{&(vlSymsp->TOP)}
 {
     // Register model with the context

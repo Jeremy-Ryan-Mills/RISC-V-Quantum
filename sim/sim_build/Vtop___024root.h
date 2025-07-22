@@ -18,8 +18,10 @@ class alignas(VL_CACHE_LINE_BYTES) Vtop___024root final : public VerilatedModule
     struct {
         VL_IN8(clk,0,0);
         VL_IN8(reset,0,0);
+        VL_IN8(sim_load_en,0,0);
         CData/*0:0*/ core__DOT__clk;
         CData/*0:0*/ core__DOT__reset;
+        CData/*0:0*/ core__DOT__sim_load_en;
         CData/*0:0*/ core__DOT__pc_sel_final;
         CData/*4:0*/ core__DOT__rs1;
         CData/*4:0*/ core__DOT__rs2;
@@ -28,10 +30,12 @@ class alignas(VL_CACHE_LINE_BYTES) Vtop___024root final : public VerilatedModule
         CData/*0:0*/ core__DOT__fetch_stage_inst__DOT__clk;
         CData/*0:0*/ core__DOT__fetch_stage_inst__DOT__reset;
         CData/*0:0*/ core__DOT__fetch_stage_inst__DOT__pc_sel;
+        CData/*0:0*/ core__DOT__fetch_stage_inst__DOT__sim_load_en;
         CData/*0:0*/ core__DOT__fetch_stage_inst__DOT__pc_inst__DOT__clk;
         CData/*0:0*/ core__DOT__fetch_stage_inst__DOT__pc_inst__DOT__reset;
         CData/*0:0*/ core__DOT__fetch_stage_inst__DOT__pc_inst__DOT__pc_sel;
         CData/*0:0*/ core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__clk;
+        CData/*0:0*/ core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__sim_load_en;
         CData/*4:0*/ core__DOT__decode_stage_inst__DOT__rs1;
         CData/*4:0*/ core__DOT__decode_stage_inst__DOT__rs2;
         CData/*4:0*/ core__DOT__decode_stage_inst__DOT__rd;
@@ -67,9 +71,17 @@ class alignas(VL_CACHE_LINE_BYTES) Vtop___024root final : public VerilatedModule
         CData/*0:0*/ __Vtrigprevexpr___TOP__clk__0;
         CData/*0:0*/ __Vtrigprevexpr___TOP__reset__0;
         CData/*0:0*/ __VactContinue;
+        VL_IN16(sim_addr,9,0);
+        SData/*9:0*/ core__DOT__sim_addr;
         SData/*11:0*/ core__DOT__ctrl;
+        SData/*9:0*/ core__DOT__fetch_stage_inst__DOT__sim_addr;
+        SData/*9:0*/ core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__sim_addr;
         SData/*11:0*/ core__DOT__decode_stage_inst__DOT__ctrl;
         SData/*11:0*/ core__DOT__decode_stage_inst__DOT__ctrl_i__DOT__ctrl;
+        VL_IN(sim_data,31,0);
+        IData/*31:0*/ core__DOT__sim_data;
+    };
+    struct {
         IData/*31:0*/ core__DOT__pc;
         IData/*31:0*/ core__DOT__alu_out;
         IData/*31:0*/ core__DOT__instr;
@@ -80,15 +92,15 @@ class alignas(VL_CACHE_LINE_BYTES) Vtop___024root final : public VerilatedModule
         IData/*31:0*/ core__DOT__mem_out;
         IData/*31:0*/ core__DOT__alu_a;
         IData/*31:0*/ core__DOT__alu_b;
-    };
-    struct {
         IData/*31:0*/ core__DOT__fetch_stage_inst__DOT__alu_out;
+        IData/*31:0*/ core__DOT__fetch_stage_inst__DOT__sim_data;
         IData/*31:0*/ core__DOT__fetch_stage_inst__DOT__pc;
         IData/*31:0*/ core__DOT__fetch_stage_inst__DOT__instr;
         IData/*31:0*/ core__DOT__fetch_stage_inst__DOT__pc_inst__DOT__alu_out;
         IData/*31:0*/ core__DOT__fetch_stage_inst__DOT__pc_inst__DOT__pc;
         IData/*31:0*/ core__DOT__fetch_stage_inst__DOT__pc_inst__DOT__pc_next;
         IData/*31:0*/ core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__pc;
+        IData/*31:0*/ core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__sim_data;
         IData/*31:0*/ core__DOT__fetch_stage_inst__DOT__instruction_mem_if_inst__DOT__instr;
         IData/*31:0*/ core__DOT__decode_stage_inst__DOT__instr;
         IData/*31:0*/ core__DOT__decode_stage_inst__DOT__imm;

@@ -31,8 +31,8 @@ async def test_addi_add(dut):
     # You may need to adapt the hierarchy here based on your design
     instr_mem = dut.fetch_stage_inst.instruction_mem_if_inst.mem
     instr_mem[0].value = 0x00400293  # addi x5, x0, 4
-    instr_mem[1].value = 0x00228313  # addi x6, x5, 2
-    instr_mem[2].value = 0x005303b3  # add x7, x6, x5
+    instr_mem[4].value = 0x00228313  # addi x6, x5, 2
+    instr_mem[8].value = 0x00b303b3  # add x7, x6, x5
 
     # Simulate core running
     for _ in range(10):
