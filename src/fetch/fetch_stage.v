@@ -6,10 +6,6 @@ module fetch_stage (
 
     input logic pc_sel,
     input logic [31:0] alu_out,
-    input logic sim_load_en,
-    input logic [`MEM_ADDR_WIDTH-1:0] sim_addr,
-    input logic [31:0] sim_data,
-
     output logic [31:0] pc,
     output logic [31:0] instr
 );
@@ -25,9 +21,6 @@ module fetch_stage (
     instruction_mem_if instruction_mem_if_inst (
         .clk(clk),
         .pc(pc),
-        .sim_load_en(sim_load_en),
-        .sim_addr(sim_addr),
-        .sim_data(sim_data),
         .instr(instr)
     );
 endmodule

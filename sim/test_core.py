@@ -32,7 +32,7 @@ async def test_addi_add(dut):
     instr_mem = dut.fetch_stage_inst.instruction_mem_if_inst.mem
     instr_mem[0].value = 0x00400293  # addi x5, x0, 4
     instr_mem[4].value = 0x00228313  # addi x6, x5, 2
-    instr_mem[8].value = 0x00b303b3  # add x7, x6, x5
+    instr_mem[8].value = 0x005303b3  # add x7, x6, x5
 
     # Simulate core running
     for _ in range(10):

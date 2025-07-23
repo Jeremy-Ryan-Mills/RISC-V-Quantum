@@ -3,48 +3,48 @@
 
 module core (
     input logic clk,
-    input logic reset,
-    input logic sim_load_en,
-    input logic [`MEM_ADDR_WIDTH-1:0] sim_addr,
-    input logic [31:0] sim_data
+    input logic reset
 );
 
+    // ----------------------------
+    // FETCH → IF stage
+    // ----------------------------
     logic [31:0] pc;
-    logic pc_sel_final;
-    logic [31:0] alu_out;
+    logic        pc_sel_final;
     logic [31:0] instr;
-    logic [31:0] rv1;
-    logic [31:0] rv2;
-    logic [4:0] rs1;
-    logic [4:0] rs2;
-    logic [4:0] rd;
-    logic [31:0] imm;
-    control_signals_t ctrl;
-    logic [31:0] writeback_result;
-    logic [31:0] mem_out;
-    logic branch_taken;
 
-    // ----------------------------
-    // FETCH STAGE
-    // ----------------------------
     fetch_stage fetch_stage_inst (
         .clk(clk),
         .reset(reset),
         .pc_sel(pc_sel_final),
-        .alu_out(alu_out),
-        .sim_load_en(sim_load_en),
-        .sim_addr(sim_addr),
-        .sim_data(sim_data),
+        .alu_out(alu_out),     // branch target
         .pc(pc),
         .instr(instr)
     );
 
     // ----------------------------
-    // DECODE STAGE
+    // IF/ID pipeline registers
     // ----------------------------
+    logic [31:0] if_id_instr, if_id_pc;
+    always_ff @(posedge clk or posedge reset) begin
+        if (reset) begin
+            if_id_instr <= 32'd0;
+            if_id_pc    <= 32'd0;
+        end else begin
+            if_id_instr <= instr;
+            if_id_pc    <= pc;
+        end
+    end
+
+    // ----------------------------
+    // DECODE → ID stage
+    // ----------------------------
+    logic [4:0] rs1, rs2, rd;
+    logic [31:0] rv1, rv2, imm;
+    control_signals_t ctrl;
 
     decode_stage decode_stage_inst (
-        .instr(instr),
+        .instr(if_id_instr),
         .rs1(rs1),
         .rs2(rs2),
         .rd(rd),
@@ -58,66 +58,106 @@ module core (
     reg_file reg_file_inst (
         .clk(clk),
         .reset(reset),
-        .we(ctrl.reg_wen),
+        .we(id_ex_ctrl.reg_wen),
         .rs1(rs1),
         .rs2(rs2),
-        .rd(rd),
+        .rd(id_ex_rd),
         .wd(writeback_result),
         .rv1(rv1),
         .rv2(rv2)
     );
 
-    // ----------------------------
-    // EXECUTE STAGE
-    // ----------------------------
 
-    logic [31:0] alu_a;
-    logic [31:0] alu_b;
+    // ----------------------------
+    // ID/EX pipeline registers
+    // ----------------------------
+    logic [31:0] id_ex_pc;
+    logic [31:0] id_ex_rv1, id_ex_rv2, id_ex_imm;
+    logic [4:0]  id_ex_rs1, id_ex_rs2, id_ex_rd;
+    control_signals_t id_ex_ctrl;
 
-    always_comb begin
-        alu_a = ctrl.a_sel ? pc : rv1;
-        alu_b = ctrl.b_sel ? imm : rv2;
+    always_ff @(posedge clk or posedge reset) begin
+        if (reset) begin
+            id_ex_pc   <= 32'd0;
+            id_ex_rv1  <= 32'd0;
+            id_ex_rv2  <= 32'd0;
+            id_ex_imm  <= 32'd0;
+            id_ex_rs1  <= 5'd0;
+            id_ex_rs2  <= 5'd0;
+            id_ex_rd   <= 5'd0;
+            id_ex_ctrl <= '0;
+        end else begin
+            id_ex_pc   <= if_id_pc;
+            id_ex_rv1  <= rv1;
+            id_ex_rv2  <= rv2;
+            id_ex_imm  <= imm;
+            id_ex_rs1  <= rs1;
+            id_ex_rs2  <= rs2;
+            id_ex_rd   <= rd;
+            id_ex_ctrl <= ctrl;
+        end
     end
+
+
+    // ----------------------------
+    // EXECUTE / WRITEBACK stage
+    // ----------------------------
+    logic [31:0] alu_out;
+    logic [31:0] alu_a, alu_b;
+
+    assign alu_a = id_ex_ctrl.a_sel ? id_ex_pc  : id_ex_rv1;
+    assign alu_b = id_ex_ctrl.b_sel ? id_ex_imm : id_ex_rv2;
 
     alu alu_inst (
         .operand_a(alu_a),
         .operand_b(alu_b),
-        .alu_op(ctrl.alu_op),
-        .result(alu_out)
+        .alu_op   (id_ex_ctrl.alu_op),
+        .result   (alu_out)
     );
+
+
+    // ----------------------------
+    // BRANCH LOGIC
+    // ----------------------------
+    logic branch_taken;
 
     branch_comp branch_comp_inst (
         .clk(clk),
         .reset(reset),
-        .rs1(rv1),
-        .rs2(rv2),
-        .instr(instr),
+        .rs1(id_ex_rv1),
+        .rs2(id_ex_rv2),
+        .instr(if_id_instr), // note: using current decoded instruction
         .branch_taken(branch_taken)
     );
 
-    assign pc_sel_final = ctrl.pc_sel & (branch_taken | (instr[6:0] != `OPCODE_BRANCH));
+    assign pc_sel_final = id_ex_ctrl.pc_sel & (branch_taken | (if_id_instr[6:0] != `OPCODE_BRANCH));
+    
+    // ----------------------------
+    // MEMORY ACCESS
+    // ----------------------------
+    logic [31:0] mem_out;
 
-    // ----------------------------
-    // MEMORY STAGE
-    // ----------------------------
     memory memory_inst (
         .clk(clk),
         .reset(reset),
         .addr(alu_out),
-        .wdata(rv2),
-        .mem_rw(ctrl.mem_rw),
+        .wdata(id_ex_rv2),       // store uses rs2
+        .mem_rw(id_ex_ctrl.mem_rw),
         .rdata(mem_out)
     );
 
     // ----------------------------
-    // WRITEBACK STAGE
+    // WRITEBACK MUX
     // ----------------------------
-    writeback_mux writeback_mux_inst (
-        .alu_out(alu_out),
-        .mem_out(mem_out),
-        .pc_plus_four(pc + 4),
-        .wb_sel(ctrl.wb_sel),
-        .reg_out(writeback_result)
-    );
+    logic [31:0] writeback_result;
+
+    always_comb begin
+        unique case (id_ex_ctrl.wb_sel)
+            2'b00: writeback_result = mem_out;
+            2'b01: writeback_result = alu_out;
+            2'b10: writeback_result = id_ex_pc + 32'd4;
+            default: writeback_result = 32'd0;
+        endcase
+    end
 
 endmodule

@@ -45,7 +45,7 @@ class alignas(VL_CACHE_LINE_BYTES)Vtop__Syms final : public VerilatedSyms {
     VerilatedScope __Vscope_core__fetch_stage_inst__pc_inst;
     VerilatedScope __Vscope_core__memory_inst;
     VerilatedScope __Vscope_core__reg_file_inst;
-    VerilatedScope __Vscope_core__writeback_mux_inst;
+    VerilatedScope __Vscope_core__reg_file_inst__unnamedblk1;
 
     // SCOPE HIERARCHY
     VerilatedHierarchy __Vhier;
