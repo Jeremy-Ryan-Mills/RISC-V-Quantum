@@ -4,4 +4,4 @@ This is a RISC-V processor project with an extended instruction set for supercon
 
 ## Tesbenches
 
-I am going to use SystemVerilog testbenches ith an Icarus Verilog backend to test the RISC-V Components of the CPU. I will verify the quantum extension to the ISA with Cocotb because it is easier to verify RF signals.
+I am going to use SystemVerilog testbenches ith a verilator backend to test the RISC-V Components of the CPU. I will verify the quantum extension to the ISA with Cocotb because it is easier to verify RF signals.
