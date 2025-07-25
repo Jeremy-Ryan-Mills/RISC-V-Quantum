@@ -5,9 +5,10 @@ module pc (
     input  logic        reset,
 
     // Control for PC selection
-    input  logic        pc_sel,          // 0 = pc+4, 1 = alu output
+    input  logic [1:0]  pc_sel,          // 0 = pc+4, 1 = alu output, 2 = predicted pc
     input  logic [31:0] alu_out,
-
+    input  logic        take_predicted_pc,
+    input  logic [31:0] predicted_pc,
     output logic [31:0] pc
 );
 
@@ -27,6 +28,8 @@ module pc (
     always_ff @(posedge clk or posedge reset) begin
         if (reset)
             pc <= `RESET_ADDR;
+        else if (take_predicted_pc)
+            pc <= predicted_pc;
         else
             pc <= pc_next;
     end

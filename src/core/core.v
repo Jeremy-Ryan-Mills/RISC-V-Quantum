@@ -10,18 +10,23 @@ module core (
     // FETCH → IF stage
     // ----------------------------
     logic [31:0] pc;
-    logic        pc_sel_final;
+    logic        pc_sel;
     logic [31:0] instr;
+    logic [31:0] predicted_pc;
+    logic        take_predicted_pc;
 
     fetch_stage fetch_stage_inst (
         .clk(clk),
         .reset(reset),
-        .pc_sel(pc_sel_final),
+        .pc_sel(pc_sel),
         .alu_out(alu_out),     // branch target
+        .predicted_pc(predicted_pc),
+        .take_predicted_pc(take_predicted_pc),
         .pc(pc),
         .instr(instr)
     );
 
+ 
     // ----------------------------
     // IF/ID pipeline registers
     // ----------------------------
@@ -42,6 +47,18 @@ module core (
     logic [4:0] rs1, rs2, rd;
     logic [31:0] rv1, rv2, imm;
     control_signals_t ctrl;
+    logic [31:0] alternate_pc;
+    logic        predict_taken;
+    logic        id_flush;
+
+
+    branch_predictor branch_predictor_inst (
+        .clk(clk),
+        .reset(reset),
+        .pc(if_id_pc),
+        .predict_taken(predict_taken),
+        .predicted_pc(predicted_pc)
+    );
 
     decode_stage decode_stage_inst (
         .instr(if_id_instr),
@@ -67,6 +84,30 @@ module core (
         .rv2(rv2)
     );
 
+    always_comb begin
+        if (ctrl.is_jump && (if_id_instr[6:0] == `OPCODE_JAL)) begin
+            take_predicted_pc = 1'b1;
+            predicted_pc = if_id_pc + imm;
+            alternate_pc = 32'd0;
+            id_flush = 1'b1;
+        end else if (ctrl.is_jump && (if_id_instr[6:0] == `OPCODE_JALR)) begin
+            take_predicted_pc = 1'b1;
+            predicted_pc = rv1 + imm;
+            alternate_pc = 32'd0;
+            id_flush = 1'b1;
+        end else if (ctrl.is_branch && predict_taken) begin
+            take_predicted_pc = 1'b1;
+            predicted_pc = predicted_pc;
+            alternate_pc = if_id_pc + 32'd4;
+            id_flush = 1'b0;
+        end else begin
+            take_predicted_pc = 1'b0;
+            predicted_pc = 32'd0;
+            alternate_pc = predicted_pc;
+            id_flush = 1'b0;
+        end
+    end
+
 
     // ----------------------------
     // ID/EX pipeline registers
@@ -75,6 +116,8 @@ module core (
     logic [31:0] id_ex_rv1, id_ex_rv2, id_ex_imm;
     logic [4:0]  id_ex_rs1, id_ex_rs2, id_ex_rd;
     control_signals_t id_ex_ctrl;
+    logic        id_ex_predict_taken;
+    logic [31:0] id_ex_predicted_pc;
 
     always_ff @(posedge clk or posedge reset) begin
         if (reset) begin
@@ -86,6 +129,19 @@ module core (
             id_ex_rs2  <= 5'd0;
             id_ex_rd   <= 5'd0;
             id_ex_ctrl <= '0;
+            id_ex_predict_taken <= 1'b0;
+            id_ex_predicted_pc <= 32'd0;
+        end else if (id_flush) begin
+            id_ex_pc   <= 32'd0;
+            id_ex_rv1  <= 32'd0;
+            id_ex_rv2  <= 32'd0;
+            id_ex_imm  <= 32'd0;
+            id_ex_rs1  <= 5'd0;
+            id_ex_rs2  <= 5'd0;
+            id_ex_rd   <= 5'd0;
+            id_ex_ctrl <= '0;
+            id_ex_predict_taken <= 1'b0;
+            id_ex_predicted_pc <= 32'd0;
         end else begin
             id_ex_pc   <= if_id_pc;
             id_ex_rv1  <= rv1;
@@ -95,6 +151,8 @@ module core (
             id_ex_rs2  <= rs2;
             id_ex_rd   <= rd;
             id_ex_ctrl <= ctrl;
+            id_ex_predict_taken <= predict_taken;
+            id_ex_predicted_pc <= predicted_pc;
         end
     end
 
@@ -115,11 +173,11 @@ module core (
         .result   (alu_out)
     );
 
-
     // ----------------------------
     // BRANCH LOGIC
     // ----------------------------
     logic branch_taken;
+    logic ex_flush;
 
     branch_comp branch_comp_inst (
         .clk(clk),
@@ -130,8 +188,52 @@ module core (
         .branch_taken(branch_taken)
     );
 
-    assign pc_sel_final = id_ex_ctrl.pc_sel & (branch_taken | (if_id_instr[6:0] != `OPCODE_BRANCH));
-    
+    always_comb begin
+        if (id_ex_ctrl.is_branch && id_ex_predict_taken && !branch_taken) begin // branch misprediction
+            pc_sel = 1'b0;
+            predicted_pc = alternate_pc;
+            take_predicted_pc = 1'b1;
+            ex_flush = 1'b1;
+        end else if (id_ex_ctrl.is_jump && !id_ex_predict_taken && branch_taken) begin // jump misprediction
+            pc_sel = 1'b0;
+            predicted_pc = alternate_pc;
+            take_predicted_pc = 1'b1;
+            ex_flush = 1'b1;
+        end else begin
+            pc_sel = 1'b0
+            predicted_pc = 32'd0;
+            take_predicted_pc = 1'b0;
+            ex_flush = 1'b0;
+        end
+    end
+
+    always_ff @(posedge clk or posedge reset) begin
+        if (reset) begin
+            ex_flush <= 1'b0;
+        end else if (ex_flush) begin
+            id_ex_pc   <= 32'd0;
+            id_ex_rv1  <= 32'd0;
+            id_ex_rv2  <= 32'd0;
+            id_ex_imm  <= 32'd0;
+            id_ex_rs1  <= 5'd0;
+            id_ex_rs2  <= 5'd0;
+            id_ex_rd   <= 5'd0;
+            id_ex_ctrl <= '0;
+            id_ex_predict_taken <= 1'b0;
+            id_ex_predicted_pc <= 32'd0;
+            if_id_instr <= 32'h00000013; // NOP
+            if_id_pc <= 32'd0;
+            id_flush <= 1'b0;
+            predict_taken <= 1'b0;
+            predicted_pc <= 32'd0;
+            alternate_pc <= 32'd0;
+            take_predicted_pc <= 1'b0;
+            id_flush <= 1'b0;
+            predict_taken <= 1'b0;
+            predicted_pc <= 32'd0;
+        end
+    end
+
     // ----------------------------
     // MEMORY ACCESS
     // ----------------------------

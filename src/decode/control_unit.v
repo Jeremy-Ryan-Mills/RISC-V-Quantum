@@ -18,7 +18,8 @@ module control_unit (
             a_sel    : 1'b0,
             mem_rw   : 1'b0,
             wb_sel   : 2'b00,
-            pc_sel   : 1'b0 
+            is_branch: 1'b0,
+            is_jump  : 1'b0
         };
 
         case (opcode)
@@ -82,12 +83,13 @@ module control_unit (
                 ctrl.reg_wen = 1'b0;
                 ctrl.b_sel   = 1'b1;
                 ctrl.a_sel   = 1'b1;
-                ctrl.alu_op  = `ALU_OP_SUB; // SUB for comparison (used internally)
+                ctrl.alu_op  = `ALU_OP_ADD; // SUB for comparison (used internally)
+                ctrl.is_branch = 1'b1;
 
                 // Use funct3 to set brun
                 case (funct3)
-                    3'b000, 3'b001, 3'b100, 3'b101: ctrl.brun = 1'b0; // BEQ, BNE, BLT, BGE (signed)
-                    3'b110, 3'b111:               ctrl.brun = 1'b1; // BLTU, BGEU (unsigned)
+                    `FUNCT3_BEQ, `FUNCT3_BNE, `FUNCT3_BLT, `FUNCT3_BGE: ctrl.brun = 1'b0; // BEQ, BNE, BLT, BGE (signed)
+                    `FUNCT3_BLTU, `FUNCT3_BGEU:               ctrl.brun = 1'b1; // BLTU, BGEU (unsigned)
                     default:                      ctrl.brun = 1'b0;
                 endcase
             end
@@ -98,7 +100,7 @@ module control_unit (
                 ctrl.a_sel = 1'b1;
                 ctrl.alu_op  = `ALU_OP_ADD;
                 ctrl.wb_sel  = 2'b10;   // PC+4
-                ctrl.pc_sel  = 1'b1;
+                ctrl.is_jump = 1'b1;
             end
 
             `OPCODE_JALR: begin
@@ -107,7 +109,7 @@ module control_unit (
                 ctrl.a_sel = 1'b0;
                 ctrl.alu_op  = `ALU_OP_ADD;
                 ctrl.wb_sel  = 2'b10;   // PC+4
-                ctrl.pc_sel  = 1'b1;
+                ctrl.is_jump = 1'b1;
             end
             `OPCODE_LUI: begin
                 ctrl.reg_wen = 1'b1;
