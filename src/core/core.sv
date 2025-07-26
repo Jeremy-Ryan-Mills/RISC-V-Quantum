@@ -55,7 +55,10 @@ module core (
         .clk(clk),
         .reset(reset),
         .pc(if_id_pc),
-        .predict_taken(predict_taken)
+        .predict_taken(predict_taken),
+        .update_en(id_ex_ctrl.is_branch),
+        .pc_u(id_ex_pc),
+        .branch_taken(branch_taken)
     );
 
     decode_stage decode_stage_inst (
