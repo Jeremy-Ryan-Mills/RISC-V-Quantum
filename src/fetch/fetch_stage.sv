@@ -4,10 +4,9 @@ module fetch_stage (
     input logic clk,
     input logic reset,
 
-    input logic pc_sel,
-    input logic [31:0] alu_out,
-    input logic take_predicted_pc,
-    input logic [31:0] predicted_pc,
+    input logic [31:0] force_pc,
+    input logic take_force_pc,
+
     output logic [31:0] pc,
     output logic [31:0] instr
 );
@@ -15,10 +14,8 @@ module fetch_stage (
     pc pc_inst (
         .clk(clk),
         .reset(reset),
-        .pc_sel(pc_sel),
-        .alu_out(alu_out),
-        .take_predicted_pc(take_predicted_pc),
-        .predicted_pc(predicted_pc),
+        .take_force_pc(take_force_pc),
+        .force_pc(force_pc),
         .pc(pc)
     );
 

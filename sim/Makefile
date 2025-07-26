@@ -1,18 +1,19 @@
 TOPLEVEL_LANG = verilog
-VERILOG_SOURCES = $(shell pwd)/../src/core/core.v \
-	$(shell pwd)/../src/fetch/fetch_stage.v \
-	$(shell pwd)/../src/fetch/instruction_mem_if.v \
-	$(shell pwd)/../src/fetch/pc.v \
-	$(shell pwd)/../src/decode/decode_stage.v \
-	$(shell pwd)/../src/decode/decoder.v \
-	$(shell pwd)/../src/decode/control_unit.v \
-	$(shell pwd)/../src/execute/alu.v \
-	$(shell pwd)/../src/execute/branch_comp.v \
-	$(shell pwd)/../src/memory/memory.v \
-	$(shell pwd)/../src/writeback/writeback_mux.v \
+VERILOG_SOURCES = $(shell pwd)/../src/core/core.sv \
+	$(shell pwd)/../src/fetch/fetch_stage.sv \
+	$(shell pwd)/../src/fetch/instruction_mem_if.sv \
+	$(shell pwd)/../src/fetch/pc.sv \
+	$(shell pwd)/../src/decode/branch_predictor.sv \
+	$(shell pwd)/../src/decode/decode_stage.sv \
+	$(shell pwd)/../src/decode/decoder.sv \
+	$(shell pwd)/../src/decode/control_unit.sv \
+	$(shell pwd)/../src/execute/alu.sv \
+	$(shell pwd)/../src/execute/branch_comp.sv \
+	$(shell pwd)/../src/memory/memory.sv \
+	$(shell pwd)/../src/writeback/writeback_mux.sv \
 	$(shell pwd)/../src/common/riscv_defines.vh \
 	$(shell pwd)/../src/common/control_types.vh \
-	$(shell pwd)/../src/common/reg_file.v
+	$(shell pwd)/../src/common/reg_file.sv
 
 TOPLEVEL = core
 MODULE = test_core  # This is test_core.py

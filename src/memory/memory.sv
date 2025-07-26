@@ -10,7 +10,7 @@ module memory (
     output logic [31:0] rdata
 );
 
-    logic [`MEM_DATA_WIDTH-1:0] mem [0:2**`MEM_ADDR_WIDTH-1];
+    logic [`MEM_DATA_WIDTH-1:0] mem [0:1<<`MEM_ADDR_WIDTH-1];
 
     always_ff @(posedge clk) begin
         if (reset) begin
