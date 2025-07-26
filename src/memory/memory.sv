@@ -18,9 +18,9 @@ module memory (
         end
         else begin
             if (mem_rw) begin
-                mem[addr[`MEM_ADDR_WIDTH-1:0]] <= wdata;
+                mem[addr[`MEM_ADDR_WIDTH+1:2]] <= wdata;
             end
-            rdata <= mem[addr[`MEM_ADDR_WIDTH-1:0]];
+            rdata <= mem[addr[`MEM_ADDR_WIDTH+1:2]];
         end
     end
 endmodule
