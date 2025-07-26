@@ -10,7 +10,6 @@ VERILOG_SOURCES = $(shell pwd)/../src/core/core.sv \
 	$(shell pwd)/../src/execute/alu.sv \
 	$(shell pwd)/../src/execute/branch_comp.sv \
 	$(shell pwd)/../src/memory/memory.sv \
-	$(shell pwd)/../src/writeback/writeback_mux.sv \
 	$(shell pwd)/../src/common/riscv_defines.vh \
 	$(shell pwd)/../src/common/control_types.vh \
 	$(shell pwd)/../src/common/reg_file.sv

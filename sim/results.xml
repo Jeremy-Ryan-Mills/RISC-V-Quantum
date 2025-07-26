@@ -1,9 +1,10 @@
 <testsuites name="results">
   <testsuite name="all" package="all">
-    <property name="random_seed" value="1753565528" />
-    <testcase name="test_core" classname="test_core" file="/home/jeremymills/Desktop/RISC-V-Quantum/sim/test_core.py" lineno="6" time="0.0013883113861083984" sim_time_ns="110.001" ratio_time="79233.66551674395" />
-    <testcase name="test_addi_add" classname="test_core" file="/home/jeremymills/Desktop/RISC-V-Quantum/sim/test_core.py" lineno="23" time="0.001936197280883789" sim_time_ns="110.001" ratio_time="56812.909038788326" />
-    <testcase name="test_logic_ops" classname="test_core" file="/home/jeremymills/Desktop/RISC-V-Quantum/sim/test_core.py" lineno="57" time="0.0008399486541748047" sim_time_ns="110.00099999999998" ratio_time="130961.5765835935" />
-    <testcase name="test_branch_instructions" classname="test_core" file="/home/jeremymills/Desktop/RISC-V-Quantum/sim/test_core.py" lineno="97" time="0.0008523464202880859" sim_time_ns="110.00100000000003" ratio_time="129056.68092419584" />
+    <property name="random_seed" value="1753570644" />
+    <testcase name="test_core" classname="test_core" file="/home/jeremymills/Desktop/RISC-V-Quantum/sim/test_core.py" lineno="6" time="0.0012576580047607422" sim_time_ns="110.001" ratio_time="87464.95437042654" />
+    <testcase name="test_addi_add" classname="test_core" file="/home/jeremymills/Desktop/RISC-V-Quantum/sim/test_core.py" lineno="23" time="0.000957489013671875" sim_time_ns="110.001" ratio_time="114884.8690996016" />
+    <testcase name="test_logic_ops" classname="test_core" file="/home/jeremymills/Desktop/RISC-V-Quantum/sim/test_core.py" lineno="57" time="0.0008985996246337891" sim_time_ns="110.00099999999998" ratio_time="122413.80586468556" />
+    <testcase name="test_branch_instructions" classname="test_core" file="/home/jeremymills/Desktop/RISC-V-Quantum/sim/test_core.py" lineno="97" time="0.0012469291687011719" sim_time_ns="160.00100000000003" ratio_time="128316.02950363292" />
+    <testcase name="test_load_store" classname="test_core" file="/home/jeremymills/Desktop/RISC-V-Quantum/sim/test_core.py" lineno="137" time="0.0006730556488037109" sim_time_ns="110.00099999999998" ratio_time="163435.22292029753" />
   </testsuite>
 </testsuites>

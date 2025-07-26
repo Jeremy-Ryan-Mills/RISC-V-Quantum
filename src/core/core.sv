@@ -104,10 +104,10 @@ module core (
     reg_file reg_file_inst (
         .clk(clk),
         .reset(reset),
-        .we(id_ex_ctrl.reg_wen),
+        .we(ex_mem_ctrl.reg_wen),
         .rs1(rs1),
         .rs2(rs2),
-        .rd(id_ex_rd),
+        .rd(ex_mem_rd),
         .wd(writeback_result),
         .rv1(rv1),
         .rv2(rv2)
@@ -165,9 +165,13 @@ module core (
     // ----------------------------
     logic [31:0] alu_out;
     logic [31:0] alu_a, alu_b;
+    logic hit_fwd_rs1, hit_fwd_rs2;
 
-    assign alu_a = id_ex_ctrl.a_sel ? id_ex_pc  : id_ex_rv1;
-    assign alu_b = id_ex_ctrl.b_sel ? id_ex_imm : id_ex_rv2;
+    assign hit_fwd_rs1 = ex_mem_ctrl.reg_wen && (ex_mem_rd != 5'd0) && (ex_mem_rd == id_ex_rs1);
+    assign hit_fwd_rs2 = ex_mem_ctrl.reg_wen && (ex_mem_rd != 5'd0) && (ex_mem_rd == id_ex_rs2);
+
+    assign alu_a = id_ex_ctrl.a_sel ? id_ex_pc  : (hit_fwd_rs1 ? writeback_result : id_ex_rv1);
+    assign alu_b = id_ex_ctrl.b_sel ? id_ex_imm : (hit_fwd_rs2 ? writeback_result : id_ex_rv2);
 
     alu alu_inst (
         .operand_a(alu_a),
@@ -180,15 +184,62 @@ module core (
     // BRANCH LOGIC
     // ----------------------------
     logic branch_taken;
+    logic [31:0] branch_in_1;
+    logic [31:0] branch_in_2;
+
+    assign branch_in_1 = hit_fwd_rs1 ? writeback_result : id_ex_rv1;
+    assign branch_in_2 = hit_fwd_rs2 ? writeback_result : id_ex_rv2;
 
     branch_comp branch_comp_inst (
         .clk(clk),
         .reset(reset),
-        .rs1(id_ex_rv1),
-        .rs2(id_ex_rv2),
+        .rs1(branch_in_1),
+        .rs2(branch_in_2),
         .instr(id_ex_instr), // note: using current decoded instruction
         .branch_taken(branch_taken)
     );
+
+
+
+    // ----------------------------
+    // EX --> MEM/WB PIPELINE REGISTERS
+    // We need the ALU output to
+    // be registered for one cycle
+    // to allow the memory to use it
+    // for a read. See memory.sv for
+    // more details.
+    // ----------------------------
+    logic [31:0] ex_mem_pc;
+    logic [31:0] ex_mem_alu_out;
+    logic [31:0] ex_mem_rv2;
+    logic [4:0]  ex_mem_rd;
+    control_signals_t ex_mem_ctrl;
+
+    always_ff @(posedge clk or posedge reset) begin
+        if (reset) begin
+            ex_mem_pc   <= 32'd0;
+            ex_mem_alu_out <= 32'd0;
+            ex_mem_rv2  <= 32'd0;
+            ex_mem_rd   <= 5'd0;
+            ex_mem_ctrl <= '{
+                reg_wen: 1'b0,
+                alu_op: `ALU_OP_ADD,
+                brun: 1'b0,
+                b_sel: 1'b0,
+                a_sel: 1'b0,
+                mem_rw: 1'b0,
+                wb_sel: 2'b00,
+                is_branch: 1'b0,
+                is_jump: 1'b0
+            };
+        end else begin
+            ex_mem_pc   <= id_ex_pc;
+            ex_mem_alu_out <= alu_out;
+            ex_mem_rv2  <= id_ex_rv2;
+            ex_mem_rd   <= id_ex_rd;
+            ex_mem_ctrl <= id_ex_ctrl;
+        end
+    end
 
     // ----------------------------
     // MEMORY ACCESS
@@ -198,9 +249,9 @@ module core (
     memory memory_inst (
         .clk(clk),
         .reset(reset),
-        .addr(alu_out),
-        .wdata(id_ex_rv2),       // store uses rs2
-        .mem_rw(id_ex_ctrl.mem_rw),
+        .addr(ex_mem_alu_out),
+        .wdata(ex_mem_rv2),       // store uses rs2
+        .mem_rw(ex_mem_ctrl.mem_rw),
         .rdata(mem_out)
     );
 
@@ -210,10 +261,10 @@ module core (
     logic [31:0] writeback_result;
 
     always_comb begin
-        unique case (id_ex_ctrl.wb_sel)
+        unique case (ex_mem_ctrl.wb_sel)
             2'b00: writeback_result = mem_out;
-            2'b01: writeback_result = alu_out;
-            2'b10: writeback_result = id_ex_pc + 32'd4;
+            2'b01: writeback_result = ex_mem_alu_out;
+            2'b10: writeback_result = ex_mem_pc + 32'd4;
             default: writeback_result = 32'd0;
         endcase
     end

@@ -114,7 +114,7 @@ async def test_branch_instructions(dut):
     instr_mem[5].value = 0x00119093   # slli x1 x3 1, this should be executed ; x1 = 8
 
     # Simulate core running
-    for _ in range(10):
+    for _ in range(15):
         await RisingEdge(dut.clk)
 
     # Now read back register values
@@ -127,5 +127,40 @@ async def test_branch_instructions(dut):
     assert x2 == 0, f"x2 != 0, got {x2}"
     assert x3 == 4, f"x3 != 4, got {x3}"
     assert x4 == 4, f"x4 != 4, got {x4}"
+
+    dut._log.info("Integration test passed")
+
+
+# ================================================
+# LOAD AND STORE INSTRUCTIONS
+# ================================================
+@cocotb.test()
+async def test_load_store(dut):
+    """Integration test: load and store instructions"""
+
+    cocotb.start_soon(Clock(dut.clk, 10, units="ns").start())
+    dut.reset.value = 1
+    await Timer(20, units="ns")
+    dut.reset.value = 0
+
+    # Load instructions into instruction memory
+    # You may need to adapt the hierarchy here based on your design
+    instr_mem = dut.fetch_stage_inst.instruction_mem_if_inst.mem
+    instr_mem[0].value = 0x00500293 # addi x5 x0 5
+    instr_mem[1].value = 0x01000313 # addi x6 x0 16
+    instr_mem[2].value = 0x00532023 # sw x5 0(x6)
+    instr_mem[3].value = 0x00000013 # nop
+    instr_mem[4].value = 0x00032383 # lw x7 0(x6)
+
+    # Simulate core running
+    for _ in range(10):
+        await RisingEdge(dut.clk)
+
+    # Now read back register values
+    x5 = dut.reg_file_inst.regs[5].value.integer
+    x7 = dut.reg_file_inst.regs[7].value.integer
+
+    assert x5 == 5, f"x5 != 5, got {x5}"
+    assert x7 == 5, f"x7 != 5, got {x7}"
 
     dut._log.info("Integration test passed")
