@@ -17,7 +17,9 @@ async def test_core(dut):
         await RisingEdge(dut.clk)
         dut._log.info(f"Cycle {i}: clk={dut.clk.value}, reset={dut.reset.value}")
 
-
+# ================================================
+# ADDI AND ADD INSTRUCTIONS
+# ================================================
 @cocotb.test()
 async def test_addi_add(dut):
     """Integration test: addi and add instruction"""
@@ -49,11 +51,12 @@ async def test_addi_add(dut):
 
     dut._log.info("Integration test passed")
 
-
-
+# ================================================
+# LOGIC OPERATIONS
+# ================================================
 @cocotb.test()
 async def test_logic_ops(dut):
-    """Integration test: addi and add instruction"""
+    """Integration test: logic instructions instruction"""
 
     cocotb.start_soon(Clock(dut.clk, 10, units="ns").start())
     dut.reset.value = 1
@@ -85,5 +88,44 @@ async def test_logic_ops(dut):
     assert x7 == 0xFF, f"x7 != 0xFF, got {x7}"
     assert x8 == 0xF0, f"x8 != 0xF0, got {x8}"
     assert x9 == 0x0, f"x9 != 0x0, got {x9}"
+
+    dut._log.info("Integration test passed")
+
+# ================================================
+# BRANCH INSTRUCTIONS
+# ================================================
+@cocotb.test()
+async def test_branch_instructions(dut):
+    """Integration test: branch instructions"""
+
+    cocotb.start_soon(Clock(dut.clk, 10, units="ns").start())
+    dut.reset.value = 1
+    await Timer(20, units="ns")
+    dut.reset.value = 0
+
+    # Load instructions into instruction memory
+    # You may need to adapt the hierarchy here based on your design
+    instr_mem = dut.fetch_stage_inst.instruction_mem_if_inst.mem
+    instr_mem[0].value = 0x00400193   # addi  addi x3 x0 4 ; x3 = 4
+    instr_mem[1].value = 0x00419463   # bne x3 x4 8 # this should be taken
+    instr_mem[2].value = 0x00700113   # addi x2 x0 7, this should be skipped over
+    instr_mem[3].value = 0x00018233   # addi x4 x3 0, this should be executed 
+    instr_mem[4].value = 0x0041c863   # blt x3 x4 8, this should not be taken
+    instr_mem[5].value = 0x00119093   # slli x1 x3 1, this should be executed ; x1 = 8
+
+    # Simulate core running
+    for _ in range(10):
+        await RisingEdge(dut.clk)
+
+    # Now read back register values
+    x1 = dut.reg_file_inst.regs[1].value.integer
+    x2 = dut.reg_file_inst.regs[2].value.integer
+    x3 = dut.reg_file_inst.regs[3].value.integer
+    x4 = dut.reg_file_inst.regs[4].value.integer
+
+    assert x1 == 8, f"x1 != 8, got {x1}"
+    assert x2 == 0, f"x2 != 0, got {x2}"
+    assert x3 == 4, f"x3 != 4, got {x3}"
+    assert x4 == 4, f"x4 != 4, got {x4}"
 
     dut._log.info("Integration test passed")
