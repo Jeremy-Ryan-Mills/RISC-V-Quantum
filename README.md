@@ -19,3 +19,9 @@ The reasons for this style of pipeline are as follows:
 ## Tesbenches
 
 I am going to use Cocotb with a verilator backend to test the processor.
+
+## Block Diagram
+
+Note that so far, only the RISC-V processor has been implemented. Soon, the Quantum ISA extension will be added.
+
+![block diagram](block_diagram.png "RISC-V Processor Block Diagram")
