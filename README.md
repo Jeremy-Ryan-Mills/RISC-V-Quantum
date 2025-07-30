@@ -25,3 +25,7 @@ I am going to use Cocotb with a verilator backend to test the processor.
 Note that so far, only the RISC-V processor has been implemented. Soon, the Quantum ISA extension will be added.
 
 ![block diagram](block_diagram.png "RISC-V Processor Block Diagram")
+
+## Pulse Scheduler
+
+In my implementation of the pulse scheduler, the RISC-V core will send instructions to the pulse scheduler over an asynchronous FIFO, and add a pulse from memory into the pulse register FIFO. This pulse register will trigger the first pulse in the FIFO when the timer matches the t_start of the pulse. For now, all envelopes are constant envelopes.
