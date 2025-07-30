@@ -76,4 +76,13 @@
 // -----------------------------------------------------------------------------
 `define BP_DEPTH        8
 
+// -----------------------------------------------------------------------------
+// Pulse register fields
+// -----------------------------------------------------------------------------
+`define PULSE_REG_PHASE_W  16
+`define PULSE_REG_AMP_W    14
+`define PULSE_REG_FREQ_W   32
+`define PULSE_REG_TSTART_W 24
+`define PULSE_REG_TLEN_W   16
+
 `endif // RISCV_DEFINES_VH
