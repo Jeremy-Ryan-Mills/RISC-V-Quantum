@@ -42,3 +42,22 @@ In my implementation of the pulse scheduler, the RISC-V core will send instructi
 | `t_len`    | **103 : 88**             | 16 bits          | Envelope length |
 | `env_addr` | **119 : 104**            | 16 bits          | Address of Envelope in Memory |
 | *reserved* | **255 : 120**            | 136 bits         | Future use (flags, CRC, channel ID, etc.).                                     |
+
+
+## Quantum ISA Extension Summary
+| Instruction                 | Format                                                     | Purpose                                                                                                         | Result                   | Notes                                                       |
+| --------------------------- | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ------------------------ | ----------------------------------------------------------- |
+| **`QPULSE rd, rs1, imm12`** | *I-type* (`opcode 0x0B`, `funct3 000`)                     | Push descriptor index **`rs1`** to the launch FIFO; schedule it **`imm12`** cycles after the current timer. | `rd` unused → write `x0` | `imm12 = 0` ⇒ play *now*.                                   |
+| **`QDELAY imm12`**          | *I-type* (`opcode 0x0B`, `funct3 001`)                     | Busy-wait inside the CPU for `imm12` scheduler cycles.                                                          | none                     | Generates **no FIFO traffic**.                              |
+| **`QWAIT_BUSY`**            | *I-type* (`opcode 0x0B`, `funct3 010`, all other fields 0) | Stall until the scheduler FIFO is empty.                                                                        | none                     | Acts like a fence.                                          |
+| **`QGETT rd`**              | *I-type* (`opcode 0x0B`, `funct3 011`, imm=0, `rs1`=0)     | Read the **32 bits** of the scheduler time-counter into `rd`.                                               | counter value            | Pipeline stalls until value is returned.                    |
+| **`QSETT rs1`**             | *I-type* (`opcode 0x0B`, `funct3 100`, imm=0, `rd`=0)      | Overwrite the scheduler time-counter with **`rs1`**.                                                            | none                     | Stalls until acknowledge; use to reset or load a base time. |
+
+
+| Bits 31-25  | 24-20      | 19-15     | 14-12   | 11-7     | 6-0         | Operation                                          |
+| ----------- | ---------- | --------- | ------- | -------- | ----------- | -------------------------------------------------- |
+| `imm[11:5]` | `imm[4:0]` | **`rs1`** | **000** | **`rd`** | **0001011** | **`QPULSE`** – enqueue `rs1` with δ = `imm[11:0]`. |
+| `imm[11:5]` | `imm[4:0]` | `00000`   | **001** | `00000`  | **0001011** | **`QDELAY`** – Wait `imm[11:0]` cycles.            |
+| `0000000`   | `00000`    | `00000`   | **010** | `00000`  | **0001011** | **`QWAIT_BUSY`** – block until FIFO empty.         |
+| `0000000`   | `00000`    | `00000`   | **011** | **`rd`** | **0001011** | **`QGETT`** – read counter into `rd`.              |
+| `0000000`   | **`rs1`**  | `00000`   | **100** | `00000`  | **0001011** | **`QSETT`** – write counter from `rs1`.            |
