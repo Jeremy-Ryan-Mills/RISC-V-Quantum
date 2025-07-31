@@ -29,3 +29,16 @@ Note that so far, only the RISC-V processor has been implemented. Soon, the Quan
 ## Pulse Scheduler
 
 In my implementation of the pulse scheduler, the RISC-V core will send instructions to the pulse scheduler over an asynchronous FIFO, and add a pulse from memory into the pulse register FIFO. This pulse register will trigger the first pulse in the FIFO when the timer matches the t_start of the pulse. For now, all envelopes are constant envelopes.
+
+## Pulse Memory
+
+| **Field**  | **Bit Range (msb\:lsb)** | **Width (bits)** | **Description**                                                                |
+| ---------- | ------------------------ | ---------------- | ------------------------------------------------------------------------------ |
+| `freq`     | **31 : 0**               | 32 bits          | Frequency |
+| `phase`    | **47 : 32**              | 16 bits          | Initial phase offset |
+| `amp`      | **61 : 48**              | 14 bits (signed) | Amplitude |
+| *spare*    | **63 : 62**              | 2 bits           | Reserved / alignment. |
+| `t_start`  | **87 : 64**              | 24 bits          | Start Time (Figure out in reference to what) |
+| `t_len`    | **103 : 88**             | 16 bits          | Envelope length |
+| `env_addr` | **119 : 104**            | 16 bits          | Address of Envelope in Memory |
+| *reserved* | **255 : 120**            | 136 bits         | Future use (flags, CRC, channel ID, etc.).                                     |

@@ -84,5 +84,6 @@
 `define PULSE_REG_FREQ_W   32
 `define PULSE_REG_TSTART_W 24
 `define PULSE_REG_TLEN_W   16
+`define ENVELOPE_ADDR_W    16
 
 `endif // RISCV_DEFINES_VH

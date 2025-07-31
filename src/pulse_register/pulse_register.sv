@@ -10,19 +10,19 @@ module pulse_register #(
 
     // Write side
     input  logic                 wr_en,
-    input  logic [PHASE_W-1:0]   wr_phase,
-    input  logic [AMP_W-1:0]     wr_amp,
-    input  logic [FREQ_W-1:0]    wr_freq,
-    input  logic [TSTART_W-1:0]  wr_tstart,
-    input  logic [TLEN_W-1:0]    wr_tlen,
+    input  logic [`PULSE_REG_PHASE_W-1:0]   wr_phase,
+    input  logic [`PULSE_REG_AMP_W-1:0]     wr_amp,
+    input  logic [`PULSE_REG_FREQ_W-1:0]    wr_freq,
+    input  logic [`PULSE_REG_TSTART_W-1:0]  wr_tstart,
+    input  logic [`PULSE_REG_TLEN_W-1:0]    wr_tlen,
 
     // Read side
     input  logic                 rd_en,
-    output logic [PHASE_W-1:0]   rd_phase,
-    output logic [AMP_W-1:0]     rd_amp,
-    output logic [FREQ_W-1:0]    rd_freq,
-    output logic [TSTART_W-1:0]  rd_tstart,
-    output logic [TLEN_W-1:0]    rd_tlen,
+    output logic [`PULSE_REG_PHASE_W-1:0]   rd_phase,
+    output logic [`PULSE_REG_AMP_W-1:0]     rd_amp,
+    output logic [`PULSE_REG_FREQ_W-1:0]    rd_freq,
+    output logic [`PULSE_REG_TSTART_W-1:0]  rd_tstart,
+    output logic [`PULSE_REG_TLEN_W-1:0]    rd_tlen,
     output logic                 full,
     output logic                 empty
 );

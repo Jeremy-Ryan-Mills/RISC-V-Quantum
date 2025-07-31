@@ -4,11 +4,12 @@ module pulse_fetch (
 
     input logic [31:0] addr,
 
-    output logic [31:0] frequency,
-    output logic [15:0] phase,
-    output logic [13:0] amplitude,
-    output logic [27:0] t_start,
-    output logic [19:0] t_len
+    output logic [`PULSE_REG_FREQ_W-1:0] frequency,
+    output logic [`PULSE_REG_PHASE_W-1:0] phase,
+    output logic [`PULSE_REG_AMP_W-1:0] amplitude,
+    output logic [`PULSE_REG_TSTART_W-1:0] t_start,
+    output logic [`PULSE_REG_TLEN_W-1:0] t_len,
+    output logic [`ENVELOPE_ADDR_W-1:0] envelope_addr
 
 );
 
@@ -24,10 +25,13 @@ module pulse_fetch (
     end
 
     // Change this, write it out
+
+    // TODO: Change this to use the defines
     assign frequency = pulse_inst[31:0];
     assign phase = pulse_inst[47:32];
     assign amplitude = pulse_inst[61:48];
-    assign t_start = pulse_inst[87:62];
-    assign t_len = pulse_inst[107:88];
+    assign t_start = pulse_inst[87:64];
+    assign t_len = pulse_inst[103:88];
+    assign envelope_addr = pulse_inst[119:104];
 
 endmodule
