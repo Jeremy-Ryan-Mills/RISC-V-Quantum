@@ -10,7 +10,7 @@ module counter (
         if (!rst_n) begin
             count_out <= 32'd0;
         end else begin
-            count_out <= count_out + 32'd4;
+            count_out <= count_out + 32'd1;
         end
     end
 

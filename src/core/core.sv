@@ -3,7 +3,11 @@
 
 module core (
     input logic clk,
-    input logic reset
+    input logic reset,
+
+    // Pulse instruction output to async fifo
+    output logic [31:0] pulse_inst_out,
+    output logic pulse_inst_out_valid
 );
 
     // ----------------------------
@@ -44,7 +48,7 @@ module core (
 
 
     // ----------------------------
-    // DECODE → ID stage
+    // DECODE stage
     // ----------------------------
     logic [4:0] rs1, rs2, rd;
     logic [31:0] rv1, rv2, imm;
@@ -69,6 +73,17 @@ module core (
         .imm(imm),
         .ctrl(ctrl)
     );
+
+    // Ouput pulse instruction if it is a pulse instruction
+    always_comb begin
+        if (if_id_instr[6:0] == `OPCODE_QUANTUM) begin
+            pulse_inst_out = if_id_instr;
+            pulse_inst_out_valid = 1'b1;
+        end else begin
+            pulse_inst_out = 32'd0;
+            pulse_inst_out_valid = 1'b0;
+        end
+    end
 
     // Take care of branch misprediction in EX first
     // Then take care of jumps and predicted jumps in ID

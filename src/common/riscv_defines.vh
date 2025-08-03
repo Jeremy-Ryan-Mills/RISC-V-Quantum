@@ -24,6 +24,7 @@
 `define OPCODE_AUIPC    7'b0010111
 `define OPCODE_MISC_MEM 7'b0001111
 `define OPCODE_SYSTEM   7'b1110011
+`define OPCODE_QUANTUM    7'b0001011
 
 // -----------------------------------------------------------------------------
 // funct3 fields (common)
