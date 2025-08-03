@@ -17,7 +17,7 @@ module pulse_register #(
     input  logic [`PULSE_REG_TLEN_W-1:0]    wr_tlen,
 
     // Read side
-    input  logic                 rd_en,
+    input  logic                            rd_en,
     output logic [`PULSE_REG_PHASE_W-1:0]   rd_phase,
     output logic [`PULSE_REG_AMP_W-1:0]     rd_amp,
     output logic [`PULSE_REG_FREQ_W-1:0]    rd_freq,
