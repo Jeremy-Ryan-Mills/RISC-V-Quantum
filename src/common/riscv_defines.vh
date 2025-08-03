@@ -86,5 +86,25 @@
 `define PULSE_REG_TSTART_W 24
 `define PULSE_REG_TLEN_W   16
 `define ENVELOPE_ADDR_W    16
+`define PULSE_REG_W        256
+
+// -----------------------------------------------------------------------------
+// Pulse register decode start
+// -----------------------------------------------------------------------------
+`define PULSE_REG_FREQ_START    0
+`define PULSE_REG_FREQ_END      31
+`define PULSE_REG_PHASE_START   32
+`define PULSE_REG_PHASE_END     47
+`define PULSE_REG_AMP_START     48
+`define PULSE_REG_AMP_END       61
+`define PULSE_REG_TSTART_START  64
+`define PULSE_REG_TSTART_END    87
+`define PULSE_REG_TLEN_START    88
+`define PULSE_REG_TLEN_END      103
+`define PULSE_REG_ENV_ADDR_START 104
+`define PULSE_REG_ENV_ADDR_END   119
+
+
+
 
 `endif // RISCV_DEFINES_VH

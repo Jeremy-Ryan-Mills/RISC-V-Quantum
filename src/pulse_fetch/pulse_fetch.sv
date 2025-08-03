@@ -24,14 +24,11 @@ module pulse_fetch (
         end
     end
 
-    // Change this, write it out
-
-    // TODO: Change this to use the defines
-    assign frequency = pulse_inst[31:0];
-    assign phase = pulse_inst[47:32];
-    assign amplitude = pulse_inst[61:48];
-    assign t_start = pulse_inst[87:64];
-    assign t_len = pulse_inst[103:88];
-    assign envelope_addr = pulse_inst[119:104];
+    assign frequency = pulse_inst[`PULSE_REG_FREQ_END:`PULSE_REG_FREQ_START];
+    assign phase = pulse_inst[`PULSE_REG_PHASE_END:`PULSE_REG_PHASE_START];
+    assign amplitude = pulse_inst[`PULSE_REG_AMP_END:`PULSE_REG_AMP_START];
+    assign t_start = pulse_inst[`PULSE_REG_TSTART_END:`PULSE_REG_TSTART_START];
+    assign t_len = pulse_inst[`PULSE_REG_TLEN_END:`PULSE_REG_TLEN_START];
+    assign envelope_addr = pulse_inst[`PULSE_REG_ENV_ADDR_END:`PULSE_REG_ENV_ADDR_START];
 
 endmodule
