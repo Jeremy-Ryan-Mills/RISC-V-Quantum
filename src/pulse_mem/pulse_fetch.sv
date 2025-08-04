@@ -10,7 +10,6 @@ module pulse_fetch (
     output logic [`PULSE_REG_TSTART_W-1:0] t_start,
     output logic [`PULSE_REG_TLEN_W-1:0] t_len,
     output logic [`ENVELOPE_ADDR_W-1:0] envelope_addr
-
 );
 
     reg [255:0] mem [0:31];

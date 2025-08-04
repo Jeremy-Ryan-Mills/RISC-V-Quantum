@@ -2,15 +2,15 @@ module pulse_scheduler (
     input logic clk,
     input logic rst_n,
 
-    input logic [31:0] pulse_inst_in,
-    input logic pulse_inst_in_valid
+    input pulse_descriptor_t pulse_inst_in, // Pulse instruction from the RISC-V core
+    input logic pulse_inst_in_valid,
 
     output logic [31:0] counter,
 
 
 );
 
-    // Pulse Instruction Decode
+    // Pulse Fetch from Memory
     logic [`PULSE_REG_FREQ_W-1:0] frequency;
     logic [`PULSE_REG_PHASE_W-1:0] phase;
     logic [`PULSE_REG_AMP_W-1:0] amplitude;
@@ -18,10 +18,11 @@ module pulse_scheduler (
     logic [`PULSE_REG_TLEN_W-1:0] t_len;
     logic [`ENVELOPE_ADDR_W-1:0] envelope_addr;
 
-    pulse_decode pulse_decode_inst (
+
+    pulse_fetch pulse_fetch_inst (
         .clk(clk),
         .rst_n(rst_n),
-        .pulse_inst(pulse_inst_in),
+        .addr(pulse_inst_in.pulse_mem_addr),
         .frequency(frequency),
         .phase(phase),
         .amplitude(amplitude),
@@ -30,6 +31,7 @@ module pulse_scheduler (
         .envelope_addr(envelope_addr)
     );
 
+    // Pulse Register
     logic [`PULSE_REG_FREQ_W-1:0] frequency_trig;
     logic [`PULSE_REG_PHASE_W-1:0] phase_trig;
     logic [`PULSE_REG_AMP_W-1:0] amplitude_trig;
@@ -39,8 +41,6 @@ module pulse_scheduler (
     logic full;
     logic empty;
     
-    
-    // Pulse Register
     // TODO: Have to figure out how to output a pulse parameters when the pulse is triggerd
     // Need to play around with the parameters
     pulse_register pulse_register_inst (
