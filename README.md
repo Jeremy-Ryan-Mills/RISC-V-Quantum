@@ -22,9 +22,11 @@ I am going to use Cocotb with a verilator backend to test the processor.
 
 ## Block Diagram
 
-Note that so far, only the RISC-V processor has been implemented. Soon, the Quantum ISA extension will be added.
+The block diagram for the RISC-V core is shown below.
 
 ![block diagram](block_diagram.png "RISC-V Processor Block Diagram")
+
+The other half of the architecture is the pulse scheduler, which uses a faster clock. The two transfer data using an asynchronous FIFO for CDC.
 
 ## Pulse Scheduler
 
@@ -38,10 +40,9 @@ In my implementation of the pulse scheduler, the RISC-V core will send instructi
 | `phase`    | **47 : 32**              | 16 bits          | Initial phase offset |
 | `amp`      | **61 : 48**              | 14 bits (signed) | Amplitude |
 | *spare*    | **63 : 62**              | 2 bits           | Reserved / alignment. |
-| `t_start`  | **87 : 64**              | 24 bits          | Start Time (Figure out in reference to what) |
-| `t_len`    | **103 : 88**             | 16 bits          | Envelope length |
-| `env_addr` | **119 : 104**            | 16 bits          | Address of Envelope in Memory |
-| *reserved* | **255 : 120**            | 136 bits         | Future use (flags, CRC, channel ID, etc.).                                     |
+| `t_len`    | **79 : 64**             | 16 bits           | Envelope length |
+| `env_addr` | **95 : 80**            | 16 bits            | Address of Envelope in Memory |
+| *reserved* | **127 : 96**            | 32 bits           | Future use (flags, CRC, channel ID, etc.).                                     |
 
 
 ## Quantum ISA Extension Summary

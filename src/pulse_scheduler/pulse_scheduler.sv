@@ -2,15 +2,17 @@ module pulse_scheduler (
     input logic clk,
     input logic rst_n,
 
-    input pulse_descriptor_t pulse_inst_in, // Pulse instruction from the RISC-V core
-    input logic pulse_inst_in_valid,
+    input pulse_descriptor_t pulse_descriptor, // Pulse instruction from the RISC-V core
+    input logic pulse_descriptor_valid,
 
     output logic [31:0] counter,
-
 
 );
 
     // Pulse Fetch from Memory
+    // - The pulse_inst_in is a description that includes the pulse memory address and the delay
+    // - The pulse fetch module will fetch the pulse parameters from the pulse memory
+    //   - Need to figure out how to pass delay into the pulse FIFO
     logic [`PULSE_REG_FREQ_W-1:0] frequency;
     logic [`PULSE_REG_PHASE_W-1:0] phase;
     logic [`PULSE_REG_AMP_W-1:0] amplitude;
@@ -18,11 +20,11 @@ module pulse_scheduler (
     logic [`PULSE_REG_TLEN_W-1:0] t_len;
     logic [`ENVELOPE_ADDR_W-1:0] envelope_addr;
 
-
     pulse_fetch pulse_fetch_inst (
         .clk(clk),
         .rst_n(rst_n),
-        .addr(pulse_inst_in.pulse_mem_addr),
+        .pulse_descriptor(pulse_descriptor),
+        .pulse_descriptor_valid(pulse_descriptor_valid),
         .frequency(frequency),
         .phase(phase),
         .amplitude(amplitude),
@@ -30,6 +32,16 @@ module pulse_scheduler (
         .t_len(t_len),
         .envelope_addr(envelope_addr)
     );
+
+    // Pipeline the pulse_descriptor_valid signal
+    logic pulse_descriptor_valid_pipe;
+    always_ff @(posedge clk) begin
+        if (rst_n) begin
+            pulse_descriptor_valid_pipe <= 1'b0;
+        end else begin
+            pulse_descriptor_valid_pipe <= pulse_descriptor_valid_pipe;
+        end
+    end
 
     // Pulse Register
     logic [`PULSE_REG_FREQ_W-1:0] frequency_trig;
@@ -40,38 +52,30 @@ module pulse_scheduler (
     logic [`ENVELOPE_ADDR_W-1:0] envelope_addr_trig;
     logic full;
     logic empty;
-    
-    // TODO: Have to figure out how to output a pulse parameters when the pulse is triggerd
-    // Need to play around with the parameters
+    logic pulse_ready;
+
+    // Pulse Register - Will pop out a pulse when the first read is valid, the first pulse can block the next pulse (figure out if this is a problem)
     pulse_register pulse_register_inst (
         .clk(clk),
         .rst_n(rst_n),
-        .wr_en(pulse_inst_in_valid),
+        .wr_en(pulse_descriptor_valid_pipe),
         .wr_phase(phase),
         .wr_amp(amplitude),
         .wr_freq(frequency),
         .wr_tstart(t_start),
         .wr_tlen(t_len),
-        .rd_en(1'b1),
+        .wr_env_addr(envelope_addr),
+        .pulse_ready(pulse_ready),
         .rd_phase(phase_trig),
         .rd_amp(amplitude_trig),
         .rd_freq(frequency_trig),
         .rd_tstart(t_start_trig),
         .rd_tlen(t_len_trig),
+        .rd_env_addr(envelope_addr_trig),
         .full(full),
         .empty(empty)
     );
 
-
-
-    // Things we need in the pulse scheduler module:
-    // 1. Decode the pulse instruction into frequency, phase, amplitude, t_start, etc.
-    // 2. Store that information into the pulse_register
-    // 3. Figure out a way to determine if the pulse is ready to be triggered,
-    //    and if it is, trigger it by sending it to the dac_axi_stream_module
-    //    using cordic, and then lock the pulse register so no other pulses are triggered
-    // 4. Figure out how to expose the clock to the riscv core for qgett instructions
-    // 5. Create an envelope memory to store the envelope data
 
 
 

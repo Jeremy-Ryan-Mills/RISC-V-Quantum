@@ -83,10 +83,10 @@
 `define PULSE_REG_PHASE_W  16
 `define PULSE_REG_AMP_W    14
 `define PULSE_REG_FREQ_W   32
-`define PULSE_REG_TSTART_W 24
+`define PULSE_REG_TSTART_W 12
 `define PULSE_REG_TLEN_W   16
 `define ENVELOPE_ADDR_W    16
-`define PULSE_REG_W        256
+`define PULSE_REG_W        128
 
 // -----------------------------------------------------------------------------
 // Pulse register decode start
@@ -97,12 +97,10 @@
 `define PULSE_REG_PHASE_END     47
 `define PULSE_REG_AMP_START     48
 `define PULSE_REG_AMP_END       61
-`define PULSE_REG_TSTART_START  64
-`define PULSE_REG_TSTART_END    87
-`define PULSE_REG_TLEN_START    88
-`define PULSE_REG_TLEN_END      103
-`define PULSE_REG_ENV_ADDR_START 104
-`define PULSE_REG_ENV_ADDR_END   119
+`define PULSE_REG_TLEN_START    64
+`define PULSE_REG_TLEN_END      79
+`define PULSE_REG_ENV_ADDR_START 80
+`define PULSE_REG_ENV_ADDR_END   95
 
 
 

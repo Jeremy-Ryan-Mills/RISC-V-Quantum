@@ -15,14 +15,16 @@ module pulse_register #(
     input  logic [`PULSE_REG_FREQ_W-1:0]    wr_freq,
     input  logic [`PULSE_REG_TSTART_W-1:0]  wr_tstart,
     input  logic [`PULSE_REG_TLEN_W-1:0]    wr_tlen,
+    input  logic [`ENVELOPE_ADDR_W-1:0]     wr_env_addr,
 
     // Read side
-    input  logic                            rd_en,
+    output logic                            pulse_ready,
     output logic [`PULSE_REG_PHASE_W-1:0]   rd_phase,
     output logic [`PULSE_REG_AMP_W-1:0]     rd_amp,
     output logic [`PULSE_REG_FREQ_W-1:0]    rd_freq,
     output logic [`PULSE_REG_TSTART_W-1:0]  rd_tstart,
     output logic [`PULSE_REG_TLEN_W-1:0]    rd_tlen,
+    output logic [`ENVELOPE_ADDR_W-1:0]     rd_env_addr,
     output logic                 full,
     output logic                 empty
 );
@@ -61,13 +63,30 @@ module pulse_register #(
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             rd_ptr <= '0;
-        end else if (rd_en && !empty) begin
-            rd_phase  <= phase_mem [rd_ptr[AW-1:0]];
-            rd_amp    <= amp_mem   [rd_ptr[AW-1:0]];
-            rd_freq   <= freq_mem  [rd_ptr[AW-1:0]];
-            rd_tstart <= tstart_mem[rd_ptr[AW-1:0]];
-            rd_tlen   <= tlen_mem  [rd_ptr[AW-1:0]];
-            rd_ptr    <= rd_ptr + 1'b1;
+        end else if (!empty) begin
+            if (tstart_mem[rd_ptr[AW-1:0]] == 0) begin
+                pulse_ready <= 1'b1;
+                rd_phase  <= phase_mem [rd_ptr[AW-1:0]];
+                rd_amp    <= amp_mem   [rd_ptr[AW-1:0]];
+                rd_freq   <= freq_mem  [rd_ptr[AW-1:0]];
+                rd_tstart <= tstart_mem[rd_ptr[AW-1:0]];
+                rd_tlen   <= tlen_mem  [rd_ptr[AW-1:0]];
+            end else begin
+                pulse_ready <= 1'b0;
+                rd_phase  <= '0;
+                rd_amp    <= '0;
+                rd_freq   <= '0;
+                rd_tstart <= '0;
+                rd_tlen   <= '0;
+            end
+            rd_ptr <= rd_ptr + 1'b1;
+        end
+    end
+
+    // Decrement all tstart values by 1 every clock cycle
+    always_ff @(posedge clk) begin
+        for (int i = 0; i < DEPTH; i++) begin
+            tstart_mem[i] <= tstart_mem[i] - 1'b1;
         end
     end
 endmodule
