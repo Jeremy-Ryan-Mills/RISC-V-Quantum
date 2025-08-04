@@ -11,9 +11,6 @@ module pulse_engine (
     input  logic [15:0]            t_len_trig,
     input  logic [15:0]            env_addr_trig,
 
-    // Time counter (low 32 bits)
-    input  logic [31:0]            time_counter,
-
     // AXI-Stream out (to DAC)
     output axis32_t                m_axis
 );

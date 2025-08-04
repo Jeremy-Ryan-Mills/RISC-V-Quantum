@@ -5,7 +5,7 @@ module pulse_scheduler (
     input pulse_descriptor_t pulse_descriptor, // Pulse instruction from the RISC-V core
     input logic pulse_descriptor_valid,
 
-    output logic [31:0] counter,
+    output logic [31:0] counter
 
 );
 
@@ -20,6 +20,8 @@ module pulse_scheduler (
     logic [`PULSE_REG_TLEN_W-1:0] t_len;
     logic [`ENVELOPE_ADDR_W-1:0] envelope_addr;
 
+
+    // TODO: Create unit test for the pulse fetch module, doesnt need to be crazy but maybe 2 tests
     pulse_fetch pulse_fetch_inst (
         .clk(clk),
         .rst_n(rst_n),
@@ -55,6 +57,7 @@ module pulse_scheduler (
     logic pulse_ready;
 
     // Pulse Register - Will pop out a pulse when the first read is valid, the first pulse can block the next pulse (figure out if this is a problem)
+    // TODO: Create unit test for the pulse register moduke, THIS IS THE MOST IMPORTANT MODULE
     pulse_register pulse_register_inst (
         .clk(clk),
         .rst_n(rst_n),
@@ -76,8 +79,22 @@ module pulse_scheduler (
         .empty(empty)
     );
 
-    // Need to create a pulse_engine module
+    axis32_t m_axis;
 
+    // Need to create a pulse_engine module
+    // TODO: Debug the pulse engine module, and figure out if it is playing something to the AXI master
+    pulse_engine pulse_engine_inst (
+        .clk(clk),
+        .rst_n(rst_n),
+        .pulse_ready(pulse_ready),
+        .pulse_phase(phase_trig),
+        .pulse_amplitude(amplitude_trig),
+        .pulse_frequency(frequency_trig),
+        .pulse_t_start(t_start_trig),
+        .pulse_t_len(t_len_trig),
+        .pulse_envelope_addr(envelope_addr_trig),
+        .m_axis(m_axis)
+    );
 
 
     counter counter_inst (

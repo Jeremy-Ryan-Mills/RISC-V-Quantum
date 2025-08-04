@@ -1,13 +1,14 @@
 `include "common/riscv_defines.vh"
 `include "common/control_types.vh"
+`include "common/pulse_descriptor.vh"
 
 module core (
     input logic clk,
     input logic reset,
 
     // Pulse instruction output to async fifo
-    output logic [31:0] pulse_inst_out,
-    output logic pulse_inst_out_valid
+    output pulse_descriptor_t pulse_descriptor,
+    output logic pulse_descriptor_valid
 );
 
     // ----------------------------
@@ -77,11 +78,17 @@ module core (
     // Ouput pulse instruction if it is a pulse instruction
     always_comb begin
         if (if_id_instr[6:0] == `OPCODE_QUANTUM) begin
-            pulse_inst_out = if_id_instr;
-            pulse_inst_out_valid = 1'b1;
+            pulse_descriptor = '{
+                delay: imm,
+                pulse_mem_addr: rs1
+            };
+            pulse_descriptor_valid = 1'b1;
         end else begin
-            pulse_inst_out = 32'd0;
-            pulse_inst_out_valid = 1'b0;
+            pulse_descriptor = '{
+                delay: `PULSE_REG_TSTART_W'd0,
+                pulse_mem_addr: `PULSE_MEM_ADDR_W'd0
+            };
+            pulse_descriptor_valid = 1'b0;
         end
     end
 
