@@ -30,9 +30,13 @@ The other half of the architecture is the pulse scheduler, which uses a faster c
 
 ## Pulse Scheduler
 
-In my implementation of the pulse scheduler, the RISC-V core will send instructions to the pulse scheduler over an asynchronous FIFO, and add a pulse from memory into the pulse register FIFO. This pulse register will trigger the first pulse in the FIFO when the timer matches the t_start of the pulse. For now, all envelopes are constant envelopes.
+The pulse scheduler is the component of the architecture that takes care of triggering pulses when they are loaded via an instruction from the RISC-V core. When a quantum pulse instruction is executed in the RISC-V core, the information will be submitted to an asynchronous FIFO, which will be accessed by the pulse scheduler. When the pulse scheduler gets the address and start time of the pulse, it will retrieve the parameters and load it into the pulse FIFO. The pulse FIFO will decrement the start time of every pulse, and will pop the first pulse when its delay is zero.
+
+Once the pulse is popped from the FIFO, it will be sent to the pulse engine, to send data to the RFSoC's DAC for pulse generation.
 
 ## Pulse Memory
+
+This is the format of pulse descriptor words in memory. These words will be loaded in when a program is compiled and instructions/memory is loaded into the design.
 
 | **Field**  | **Bit Range (msb\:lsb)** | **Width (bits)** | **Description**                                                                |
 | ---------- | ------------------------ | ---------------- | ------------------------------------------------------------------------------ |
@@ -44,8 +48,10 @@ In my implementation of the pulse scheduler, the RISC-V core will send instructi
 | `env_addr` | **95 : 80**            | 16 bits            | Address of Envelope in Memory |
 | *reserved* | **127 : 96**            | 32 bits           | Future use (flags, CRC, channel ID, etc.).                                     |
 
-
 ## Quantum ISA Extension Summary
+
+These are the quantum instructions that are supported in the RISC-V processor. 
+
 | Instruction                 | Format                                                     | Purpose                                                                                                         | Result                   | Notes                                                       |
 | --------------------------- | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ------------------------ | ----------------------------------------------------------- |
 | **`QPULSE rd, rs1, imm12`** | *I-type* (`opcode 0x0B`, `funct3 000`)                     | Push descriptor index **`rs1`** to the launch FIFO; schedule it **`imm12`** cycles after the current timer. | `rd` unused → write `x0` | `imm12 = 0` ⇒ play *now*.                                   |
@@ -62,3 +68,8 @@ In my implementation of the pulse scheduler, the RISC-V core will send instructi
 | `0000000`   | `00000`    | `00000`   | **010** | `00000`  | **0001011** | **`QWAIT_BUSY`** – block until FIFO empty.         |
 | `0000000`   | `00000`    | `00000`   | **011** | **`rd`** | **0001011** | **`QGETT`** – read counter into `rd`.              |
 | `0000000`   | **`rs1`**  | `00000`   | **100** | `00000`  | **0001011** | **`QSETT`** – write counter from `rs1`.            |
+
+## To-Do:
+
+1. Implement the pulse engine
+2. Implement quantum op decoding in the RISC-V core
