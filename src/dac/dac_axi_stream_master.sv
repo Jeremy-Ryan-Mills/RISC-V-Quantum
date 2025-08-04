@@ -1,44 +1,20 @@
+module dac_axi_master (
+    input  logic         clk,
+    input  logic         rst_n,
 
-module dac_axi_stream_master #(
-    parameter DATA_W = 32      // 16‑bit I + 16‑bit Q per sample
-)(
-    input  logic              ACLK,     // clk_q (same as pulse engine)
-    input  logic              ARESETN,
+    // From pulse engine
+    input  logic [31:0]  iq_sample,
+    input  logic         valid_iq,
 
-    // Pulse‑engine side handshake
-    input  logic [DATA_W-1:0] samp_in,
-    input  logic              samp_valid,
-    output logic              samp_ready,
-
-    // AXI‑Stream interface to RF‑DAC tile
-    output logic [DATA_W-1:0] M_TDATA,
-    output logic              M_TVALID,
-    input  logic              M_TREADY,
-    output logic              M_TLAST,
-    output logic [DATA_W/8-1:0] M_TKEEP
+    // AXI4-Stream output
+    output logic [31:0]  m_axis_tdata,
+    output logic         m_axis_tvalid,
+    input  logic         m_axis_tready,  // Should always be 1
+    output logic         m_axis_tlast    // Not used but required by some DACs
 );
-    // Two‑entry skid buffer for back‑pressure handling
-    logic                     hold;
-    logic [DATA_W-1:0]        hold_data;
+    // Output assignment
+    assign m_axis_tdata  = iq_sample;
+    assign m_axis_tvalid = valid_iq;
+    assign m_axis_tlast  = 1'b0; // Optional, set to 1 if last beat in burst
 
-    assign samp_ready = ~hold | M_TREADY;   // back‑pressure to DDS
-    assign M_TDATA    = hold ? hold_data : samp_in;
-    assign M_TVALID   = hold ? 1'b1      : samp_valid;
-    assign M_TLAST    = 1'b0;            // continuous stream
-    assign M_TKEEP    = {DATA_W/8{1'b1}};
-
-    always_ff @(posedge ACLK or negedge ARESETN) begin
-        if (!ARESETN) begin
-            hold <= 1'b0;
-        end else begin
-            // Capture sample when engine valid & DAC not ready
-            if (!hold && samp_valid && !M_TREADY) begin
-                hold      <= 1'b1;
-                hold_data <= samp_in;
-            end else if (hold && M_TREADY) begin
-                hold <= 1'b0;
-            end
-        end
-    end
-endmodule // dac_axi_stream_master
-
+endmodule
