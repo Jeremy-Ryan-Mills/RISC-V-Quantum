@@ -164,3 +164,72 @@ async def test_load_store(dut):
     assert x7 == 5, f"x7 != 5, got {x7}"
 
     dut._log.info("Integration test passed")
+
+
+# ================================================
+# JAL INSTRUCTION
+# ================================================
+@cocotb.test()
+async def test_jal(dut):
+    """Integration test: jal instruction"""
+
+    cocotb.start_soon(Clock(dut.clk, 10, units="ns").start())
+    dut.reset.value = 1
+    await Timer(20, units="ns")
+    dut.reset.value = 0
+
+    # Load instructions into instruction memory
+    # You may need to adapt the hierarchy here based on your design
+    instr_mem = dut.fetch_stage_inst.instruction_mem_if_inst.mem
+
+    #  0: jal   x1, +12        ; jump to index 3, x1 = 4
+    instr_mem[0].value = 0x00C000EF
+    #  1: addi  x2, x0, 5      ; should be skipped
+    instr_mem[1].value = 0x00500113
+    #  2: addi  x3, x0, 6      ; should be skipped
+    instr_mem[2].value = 0x00600193
+    #  3: addi  x4, x0, 7      ; executed, x4 = 7
+    instr_mem[3].value = 0x00700213
+    #  4: addi  x5, x0, 32     ; x5 = 32 (target for jalr)
+    instr_mem[4].value = 0x02000293
+    #  5: jalr  x6, 0(x5)      ; jump to 32 (index 8), x6 = 24
+    instr_mem[5].value = 0x00028367
+    #  6: addi  x9, x0, 11     ; filler, skipped
+    instr_mem[6].value = 0x00B00493
+    #  7: addi  x10,x0, 12     ; filler, skipped
+    instr_mem[7].value = 0x00C00513
+    #  8: addi  x11,x0, 13     ; executed, x11 = 13
+    instr_mem[8].value = 0x00D00593
+
+    # Let the core run long enough for pipeline & control-flow to settle
+    for _ in range(30):
+        await RisingEdge(dut.clk)
+
+    # ---------------------------------
+    # Read back architectural registers
+    # ---------------------------------
+    regs = dut.reg_file_inst.regs
+    x1  = regs[1].value.integer
+    x2  = regs[2].value.integer
+    x3  = regs[3].value.integer
+    x4  = regs[4].value.integer
+    x5  = regs[5].value.integer
+    x6  = regs[6].value.integer
+    x9  = regs[9].value.integer
+    x10 = regs[10].value.integer
+    x11 = regs[11].value.integer
+
+    # ----------------------
+    # Functional assertions
+    # ----------------------
+    assert x1  == 4,   f"x1 (link from JAL) expected 4, got {x1}"
+    assert x2  == 0,   f"x2 should remain 0 (skipped), got {x2}"
+    assert x3  == 0,   f"x3 should remain 0 (skipped), got {x3}"
+    assert x4  == 7,   f"x4 expected 7, got {x4}"
+    assert x5  == 32,  f"x5 expected 32, got {x5}"
+    assert x6  == 24,  f"x6 (link from JALR) expected 24, got {x6}"
+    assert x9  == 0,   f"x9 should remain 0 (skipped), got {x9}"
+    assert x10 == 0,   f"x10 should remain 0 (skipped), got {x10}"
+    assert x11 == 13,  f"x11 expected 13, got {x11}"
+
+    dut._log.info("Integration test passed")
