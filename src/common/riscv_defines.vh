@@ -87,6 +87,7 @@
 `define PULSE_REG_TLEN_W   16
 `define ENVELOPE_ADDR_W    16
 `define PULSE_REG_W        128
+`define PULSE_MEM_ADDR_W   16
 
 // -----------------------------------------------------------------------------
 // Pulse register decode start

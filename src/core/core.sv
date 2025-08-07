@@ -76,6 +76,7 @@ module core (
     );
 
     // Ouput pulse instruction if it is a pulse instruction
+    /*
     always_comb begin
         if (if_id_instr[6:0] == `OPCODE_QUANTUM) begin
             pulse_descriptor = '{
@@ -91,6 +92,7 @@ module core (
             pulse_descriptor_valid = 1'b0;
         end
     end
+    */
 
     // Take care of branch misprediction in EX first
     // Then take care of jumps and predicted jumps in ID
