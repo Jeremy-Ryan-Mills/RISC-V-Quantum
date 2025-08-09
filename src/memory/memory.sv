@@ -21,7 +21,8 @@ module memory (
     
     always_ff @(posedge clk) begin
         if (reset) begin
-            // rdata <= 32'b0;
+            mem = '{default:32'h00000013};  // NOP
+
         end
         else begin
             if (mem_rw) begin

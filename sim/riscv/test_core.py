@@ -244,7 +244,7 @@ async def test_end_to_end_no_jumps(dut):
 
     cocotb.start_soon(Clock(dut.clk, 10, units="ns").start())
     dut.reset.value = 1
-    await Timer(40, units="ns")
+    await Timer(20, units="ns")
     dut.reset.value = 0
 
     imem = dut.fetch_stage_inst.instruction_mem_if_inst.mem
@@ -306,7 +306,7 @@ async def test_jumps_combo(dut):
 
     cocotb.start_soon(Clock(dut.clk, 10, units="ns").start())
     dut.reset.value = 1
-    await Timer(40, units="ns")
+    await Timer(20, units="ns")
     dut.reset.value = 0
 
     imem = dut.fetch_stage_inst.instruction_mem_if_inst.mem
@@ -328,6 +328,11 @@ async def test_jumps_combo(dut):
     imem[11].value = 0x00532023  # sw   x5, 0(x6)
     imem[12].value = 0x00032383  # lw   x7, 0(x6)   ; x7 = 5
     imem[13].value = 0x0062E3B3  # or   x7, x5, x6  ; x7 = 5 | 16 = 21
+
+    # Print the contents of the instruction memory
+    # imem = dut.fetch_stage_inst.instruction_mem_if_inst.mem
+    for i in range(0, 16):
+        print(f"IMEM[{i}] = 0x{int(imem[i].value):08x}")
 
     for _ in range(100):
         await RisingEdge(dut.clk)
