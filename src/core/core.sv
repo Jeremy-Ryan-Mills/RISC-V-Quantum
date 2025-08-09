@@ -94,6 +94,13 @@ module core (
     end
     */
 
+    logic [31:0] id_rs1_for_jump;
+    assign id_rs1_for_jump =
+        (ex_mem_ctrl.reg_wen && ex_mem_rd != 5'd0 && ex_mem_rd == rs1)
+            ? writeback_result
+            : rv1;
+
+
     // Take care of branch misprediction in EX first
     // Then take care of jumps and predicted jumps in ID
     always_comb begin // Set branch prediction flushes and alternate pc
@@ -105,12 +112,12 @@ module core (
         end else if (ctrl.is_jump && (if_id_instr[6:0] == `OPCODE_JAL)) begin // If the ID is JAL, then jump
             if_flush = 1'b1;
             id_flush = 1'b0;
-            force_pc = if_id_pc + imm;
+            force_pc = id_rs1_for_jump + imm;
             take_force_pc = 1'b1;
         end else if (ctrl.is_jump && (if_id_instr[6:0] == `OPCODE_JALR)) begin
             if_flush = 1'b1;
             id_flush = 1'b0;
-            force_pc = rv1 + imm;
+            force_pc = id_rs1_for_jump + imm;
             take_force_pc = 1'b1;
         end else if (ctrl.is_branch) begin
             if_flush = predict_taken;

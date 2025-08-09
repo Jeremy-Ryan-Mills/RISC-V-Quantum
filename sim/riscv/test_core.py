@@ -233,3 +233,116 @@ async def test_jal(dut):
     assert x11 == 13,  f"x11 expected 13, got {x11}"
 
     dut._log.info("Integration test passed")
+
+
+# ================================================
+# MIXED: ALU + LOGIC + BRANCH + MEM (no jumps)
+# ================================================
+@cocotb.test()
+async def test_end_to_end_no_jumps(dut):
+    """End-to-end: ADD/ADDI, OR/XOR/AND, branches, LW/SW"""
+
+    cocotb.start_soon(Clock(dut.clk, 10, units="ns").start())
+    dut.reset.value = 1
+    await Timer(40, units="ns")
+    dut.reset.value = 0
+
+    imem = dut.fetch_stage_inst.instruction_mem_if_inst.mem
+
+    # --- ALU chain ---
+    imem[0].value  = 0x00400293  # addi x5, x0, 4
+    imem[1].value  = 0x00228313  # addi x6, x5, 2     ; x6 = 6
+    imem[2].value  = 0x005303B3  # add  x7, x6, x5    ; x7 = 10
+
+    # --- logic ops ---
+    imem[3].value  = 0x00F00293  # addi x5, x0, 15    ; x5 = 0x0F
+    imem[4].value  = 0x0F000313  # addi x6, x0, 0xF0  ; x6 = 0xF0
+    imem[5].value  = 0x0062E3B3  # or   x7, x5, x6    ; x7 = 0xFF
+    imem[6].value  = 0x0053C433  # xor  x8, x7, x5    ; x8 = 0xF0
+    imem[7].value  = 0x0062F4B3  # and  x9, x5, x6    ; x9 = 0x00
+
+    # --- branches ---
+    imem[8].value  = 0x00400193  # addi x3, x0, 4     ; x3 = 4
+    imem[9].value  = 0x00419463  # bne  x3, x4, +8    ; skip next
+    imem[10].value = 0x00700113  # addi x2, x0, 7     ; skipped
+    imem[11].value = 0x00018233  # add  x4, x3, x0    ; x4 = 4
+    imem[12].value = 0x0041C863  # blt  x3, x4, +8    ; not taken
+    imem[13].value = 0x00119093  # slli x1, x3, 1     ; x1 = 8
+
+    # --- memory round-trip ---
+    imem[14].value = 0x00500293  # addi x5, x0, 5     ; x5 = 5
+    imem[15].value = 0x01000313  # addi x6, x0, 16    ; x6 = 16
+    imem[16].value = 0x00532023  # sw   x5, 0(x6)
+    imem[17].value = 0x00000013  # nop
+    imem[18].value = 0x00032383  # lw   x7, 0(x6)     ; x7 = 5
+
+    for _ in range(80):
+        await RisingEdge(dut.clk)
+
+    regs = dut.reg_file_inst.regs
+    x = lambda r: regs[r].value.integer
+
+    # Final state checks
+    assert x(1) == 8
+    assert x(2) == 0
+    assert x(3) == 4
+    assert x(4) == 4
+    assert x(5) == 5
+    assert x(6) == 16
+    assert x(7) == 5          # from LW
+    assert x(8) == 0xF0
+    assert x(9) == 0x0
+
+    dut._log.info("End-to-end (no jumps) test passed")
+
+
+# ================================================
+# MIXED: JAL/JALR + MEM + a bit of logic
+# (keeps your original JAL/JALR encodings)
+# ================================================
+@cocotb.test()
+async def test_jumps_combo(dut):
+    """Combine JAL/JALR with some memory + logic afterward"""
+
+    cocotb.start_soon(Clock(dut.clk, 10, units="ns").start())
+    dut.reset.value = 1
+    await Timer(40, units="ns")
+    dut.reset.value = 0
+
+    imem = dut.fetch_stage_inst.instruction_mem_if_inst.mem
+
+    # --- your JAL/JALR sequence (indices 0..8) ---
+    imem[0].value = 0x00C000EF  # jal  x1, +12   ; jump to index 3, x1=4
+    imem[1].value = 0x00500113  # addi x2, x0, 5 ; skipped
+    imem[2].value = 0x00600193  # addi x3, x0, 6 ; skipped
+    imem[3].value = 0x00700213  # addi x4, x0, 7 ; executed
+    imem[4].value = 0x02000293  # addi x5, x0, 32
+    imem[5].value = 0x00028367  # jalr x6, 0(x5) ; jump to addr 32 -> index 8, x6=24
+    imem[6].value = 0x00B00493  # addi x9,  x0, 11 ; filler, skipped
+    imem[7].value = 0x00C00513  # addi x10, x0, 12 ; filler, skipped
+    imem[8].value = 0x00D00593  # addi x11, x0, 13 ; executed
+
+    # --- extra work after jumps (indices 9..12) ---
+    imem[9].value  = 0x00500293  # addi x5, x0, 5
+    imem[10].value = 0x01000313  # addi x6, x0, 16
+    imem[11].value = 0x00532023  # sw   x5, 0(x6)
+    imem[12].value = 0x00032383  # lw   x7, 0(x6)   ; x7 = 5
+    imem[13].value = 0x0062E3B3  # or   x7, x5, x6  ; x7 = 5 | 16 = 21
+
+    for _ in range(100):
+        await RisingEdge(dut.clk)
+
+    regs = dut.reg_file_inst.regs
+    x = lambda r: regs[r].value.integer
+
+    # Jumps + follow-on effects
+    assert x(1)  == 4     # JAL link
+    assert x(2)  == 0     # skipped
+    assert x(3)  == 0     # skipped
+    assert x(4)  == 7
+    assert x(6)  == 16    # overwritten later by addi (after jalr); link value (24) was in x6 before this
+    assert x(11) == 13
+    assert x(5)  == 5
+    assert x(7)  == 21, f"x7 != 21, got {x(7)}"   # 21
+
+    dut._log.info("Jumps combo test passed")
