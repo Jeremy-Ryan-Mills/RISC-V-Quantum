@@ -7,8 +7,8 @@ module core (
     input logic reset,
 
     // Pulse instruction output to async fifo
-    output pulse_descriptor_t pulse_descriptor,
-    output logic pulse_descriptor_valid
+    //output pulse_descriptor_t pulse_descriptor,
+    //output logic pulse_descriptor_valid
 );
 
     // ----------------------------
