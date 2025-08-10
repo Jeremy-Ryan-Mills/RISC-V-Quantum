@@ -15,8 +15,11 @@ venv/
 **/*.hw/
 **/*.cache/
 **/*.ip_user_files/
+*.ip_user_files/
+*.runs/
 **/*.sim/
 *xpr
+
 
 # Test results
 *results.xml

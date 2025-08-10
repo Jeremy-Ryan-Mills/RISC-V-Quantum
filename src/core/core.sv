@@ -1,6 +1,6 @@
 `include "common/riscv_defines.vh"
 `include "common/control_types.vh"
-`include "common/pulse_descriptor.vh"
+//`include "common/pulse_descriptor.vh"
 
 module core (
     input logic clk,
