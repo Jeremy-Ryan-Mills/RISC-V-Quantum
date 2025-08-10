@@ -2,7 +2,7 @@
 
 This is a RISC-V processor project with an extended instruction set for superconducting qubit control. This is a personal project in order to learn Verilog and apply my knowledge of Quantum Control Electronics to a project.
 
-The project in Vivado can be build with `./scripts/create_core_project.sh`. Currently, I have completed the RISC-V core, so that is what the script will build. I am working on the gateware for the high frequency pulse scheduler. Additionally, I do not have access to an RFSoC currently, so the RISC-V core is built for a **Xilinx PYNQ-Z1** development board, that contains a **Zynq 7000 SoC**.
+The project in Vivado can be build with `./scripts/create_core_project.sh`. Currently, I have completed the RISC-V core, so that is what the script will build. I am working on the gateware for the high frequency pulse scheduler. Additionally, I do not have access to an RFSoC currently, so the RISC-V core is built for a **Xilinx PYNQ-Z1** development board, that contains a **Zynq 7000 SoC**. The specs for this development board can be found at this [link](https://digilent.com/reference/programmable-logic/pynq-z1/reference-manual?redirect=1).
 
 ## Microarchitecture
 
