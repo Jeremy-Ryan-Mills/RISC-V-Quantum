@@ -4,7 +4,7 @@
 
 module core (
     input logic clk,
-    input logic reset,
+    input logic reset
 
     // Pulse instruction output to async fifo
     //output pulse_descriptor_t pulse_descriptor,
