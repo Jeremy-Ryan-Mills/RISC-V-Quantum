@@ -2,6 +2,8 @@
 
 This is a RISC-V processor project with an extended instruction set for superconducting qubit control. This is a personal project in order to learn Verilog and apply my knowledge of Quantum Control Electronics to a project.
 
+The project in Vivado can be build with `./scripts/create_core_project.sh`. Currently, I have completed the RISC-V core, so that is what the script will build. I am working on the gateware for the high frequency pulse scheduler. Additionally, I do not have access to an RFSoC currently, so the RISC-V core is built for a **Xilinx PYNQ-Z1** development board, that contains a **Zynq 7000 SoC**.
+
 ## Microarchitecture
 
 This RISC-V processor has four pipelined stages:
@@ -18,7 +20,7 @@ The reasons for this style of pipeline are as follows:
 
 ## Tesbenches
 
-I am going to use Cocotb with a verilator backend to test the processor.
+I am going to use Cocotb with a verilator backend to test the processor. All of the current test benches are for the RISC-V core (pulse scheduler is still in development). You can find the Cocotb tests in the `./sim/riscv` directory. The tests can be ran by calling `make` in that directory.
 
 ## Block Diagram
 
