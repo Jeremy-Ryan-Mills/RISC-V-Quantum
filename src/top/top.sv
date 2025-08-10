@@ -2,7 +2,7 @@ module top (
     input logic core_clk,
     input logic core_rst_n,
     input logic ps_clk,
-    input logic ps_rst_n,
+    input logic ps_rst_n
 );
 
     pulse_descriptor_t pulse_descriptor;

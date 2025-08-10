@@ -11,5 +11,12 @@ venv/
 *fst
 *vcd
 
+# Vivado
+**/*.hw/
+**/*.cache/
+**/*.ip_user_files/
+**/*.sim/
+*xpr
+
 # Test results
 *results.xml
