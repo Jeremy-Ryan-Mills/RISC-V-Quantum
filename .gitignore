@@ -19,6 +19,7 @@ venv/
 *.runs/
 **/*.sim/
 *xpr
+**/*.srcs/
 
 
 # Test results
