@@ -12,9 +12,18 @@ VERILOG_SOURCES = $(shell pwd)/../../src/core/core.sv \
 	$(shell pwd)/../../src/memory/memory.sv \
 	$(shell pwd)/../../src/common/riscv_defines.vh \
 	$(shell pwd)/../../src/common/control_types.vh \
-	$(shell pwd)/../../src/common/reg_file.sv
+	$(shell pwd)/../../src/common/reg_file.sv \
+	$(shell pwd)/../../src/pulse_engine/pulse_engine.sv \
+	$(shell pwd)/../../src/pulse_mem/pulse_fetch.sv \
+	$(shell pwd)/../../src/pulse_registers/pulse_registers.sv \
+	$(shell pwd)/../../src/pulse_scheduler/pulse_scheduler.sv \
+	$(shell pwd)/../../src/pulse_scheduler/counter.sv \
+	$(shell pwd)/../../src/dac/dac_axi_master.sv \
+	$(shell pwd)/../../src/common/pulse_descriptor.sv \
+	$(shell pwd)/../../src/top/top.sv \
+	$(shell pwd)/../../src/top/async_fifo.sv \
 
-TOPLEVEL = core
+TOPLEVEL = top
 MODULE = test_integration  # This is test_integration.py
 SIM = verilator
 

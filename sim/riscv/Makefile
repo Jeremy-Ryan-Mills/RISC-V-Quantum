@@ -12,7 +12,8 @@ VERILOG_SOURCES = $(shell pwd)/../../src/core/core.sv \
 	$(shell pwd)/../../src/memory/memory.sv \
 	$(shell pwd)/../../src/common/riscv_defines.vh \
 	$(shell pwd)/../../src/common/control_types.vh \
-	$(shell pwd)/../../src/common/reg_file.sv
+	$(shell pwd)/../../src/common/reg_file.sv \
+	$(shell pwd)/../../src/common/pulse_descriptor.sv \
 
 TOPLEVEL = core
 MODULE = test_core  # This is test_core.py
