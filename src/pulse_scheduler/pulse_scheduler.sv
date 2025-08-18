@@ -1,3 +1,31 @@
+/**
+ * Pulse Scheduler Module
+ * 
+ * This module orchestrates the complete pulse generation pipeline by coordinating
+ * pulse memory fetching, pulse queuing, and pulse execution. It serves as the
+ * main controller for the quantum pulse generation system.
+ * 
+ * Operation Flow:
+ * 1. Receives pulse descriptors from the RISC-V core
+ * 2. Fetches detailed pulse parameters from pulse memory via pulse_fetch
+ * 3. Queues pulses in the pulse_register FIFO with timing control
+ * 4. Drives the pulse_engine to generate actual pulse waveforms
+ * 5. Outputs AXI-Stream data to downstream DAC or processing modules
+ * 
+ * Key Features:
+ * - Handles pulse timing and sequencing
+ * - Manages pulse parameter buffering
+ * - Provides AXI-Stream interface for waveform output
+ * - Supports multiple queued pulses with different timing requirements
+ * 
+ * @param clk                    System clock
+ * @param rst_n                  Active-low reset
+ * @param pulse_descriptor       Pulse instruction from RISC-V core
+ * @param pulse_descriptor_valid Valid signal for pulse descriptor
+ * @param m_axis_tdata          AXI-Stream data output (32-bit I/Q samples)
+ * @param m_axis_tvalid         AXI-Stream valid signal
+ * @param m_axis_tready         AXI-Stream ready signal from downstream
+ */
 module pulse_scheduler (
     input logic clk,
     input logic rst_n,

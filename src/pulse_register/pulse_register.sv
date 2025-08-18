@@ -1,5 +1,49 @@
+/**
+ * Pulse Register FIFO Module
+ * 
+ * A configurable FIFO that stores and manages pulse instructions with automatic
+ * timing control. This module implements a smart queuing system that decrements
+ * start time values and automatically triggers pulses when their delay expires.
+ * 
+ * Operation:
+ * 1. Stores incoming pulse parameters (frequency, phase, amplitude, timing, etc.)
+ * 2. Automatically decrements t_start values every clock cycle
+ * 3. Outputs pulse_ready when t_start reaches 0
+ * 4. Provides registered outputs for stable pulse parameter reading
+ * 
+ * Key Features:
+ * - Configurable depth (default 16)
+ * - Automatic timing control with t_start decrementing
+ * - Full/empty status indicators
+ * - Synchronous read/write operations
+ * - Gray-coded pointers for reliable full/empty detection
+ * 
+ * Timing Behavior:
+ * - Pulses with t_start=0 are immediately ready
+ * - Pulses with t_start>0 are queued and automatically triggered
+ * - All t_start values decrement simultaneously every clock cycle
+ * 
+ * @param DEPTH        FIFO depth (default 16)
+ * @param clk          System clock
+ * @param rst_n        Active-low reset
+ * @param wr_en        Write enable
+ * @param wr_phase     Write phase parameter
+ * @param wr_amp       Write amplitude parameter
+ * @param wr_freq      Write frequency parameter
+ * @param wr_tstart    Write start time parameter
+ * @param wr_tlen      Write length parameter
+ * @param wr_env_addr  Write envelope address
+ * @param pulse_ready  Pulse ready output (asserted when t_start=0)
+ * @param rd_phase     Read phase parameter
+ * @param rd_amp       Read amplitude parameter
+ * @param rd_freq      Read frequency parameter
+ * @param rd_tstart    Read start time parameter
+ * @param rd_tlen      Read length parameter
+ * @param rd_env_addr  Read envelope address
+ * @param full         FIFO full indicator
+ * @param empty        FIFO empty indicator
+ */
 `include "riscv_defines.vh"
-
 
 // Pulse register is a FIFO that stores pulse isntructions
 module pulse_register #(

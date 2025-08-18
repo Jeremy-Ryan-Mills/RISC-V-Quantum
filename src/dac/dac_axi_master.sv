@@ -1,3 +1,41 @@
+/**
+ * DAC AXI Master Module
+ * 
+ * AXI4-Stream interface module that provides buffering and handshaking between
+ * the pulse engine and downstream DAC modules. Implements a 1-depth skid buffer
+ * to decouple ready/valid handshaking and ensure reliable data transfer.
+ * 
+ * Operation:
+ * 1. Receives I/Q samples from pulse_engine via upstream interface
+ * 2. Buffers samples in a single register to handle timing mismatches
+ * 3. Forwards samples to DAC via AXI4-Stream interface
+ * 4. Manages backpressure between upstream and downstream
+ * 
+ * Buffer Behavior:
+ * - 1-depth skid buffer (register slice) for timing decoupling
+ * - Handles cases where upstream and downstream have different ready/valid timing
+ * - Provides flow control to prevent data loss
+ * - Supports pass-through operation when buffer is empty
+ * 
+ * Key Features:
+ * - Configurable data width (default 32-bit)
+ * - Automatic backpressure handling
+ * - TLAST signal support for frame boundaries
+ * - Clean handshaking protocol compliance
+ * - Minimal latency buffering
+ * 
+ * @param DATA_W         Data width (default 32)
+ * @param clk            System clock
+ * @param rst_n          Active-low reset
+ * @param iq_sample      I/Q sample data from pulse_engine
+ * @param valid_iq       Valid signal from pulse_engine
+ * @param last_iq        Last signal from pulse_engine (optional)
+ * @param ready_iq       Ready signal to pulse_engine
+ * @param m_axis_tdata   AXI-Stream data to DAC
+ * @param m_axis_tvalid  AXI-Stream valid signal
+ * @param m_axis_tready  AXI-Stream ready signal from DAC
+ * @param m_axis_tlast   AXI-Stream last signal
+ */
 // AXI4-Stream shim between pulse_engine and DAC
 module dac_axi_master #(
   parameter int DATA_W = 32

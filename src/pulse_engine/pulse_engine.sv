@@ -1,3 +1,58 @@
+/**
+ * Pulse Engine Module
+ * 
+ * Core waveform generation module that creates precise quantum control pulses
+ * using direct digital synthesis (DDS) techniques. Generates complex waveforms
+ * by combining frequency synthesis, amplitude modulation, and envelope shaping.
+ * 
+ * Operation:
+ * 1. Receives pulse parameters from scheduler (frequency, phase, amplitude, timing)
+ * 2. Implements phase accumulator for frequency synthesis
+ * 3. Generates sin/cos samples via CORDIC algorithm
+ * 4. Applies amplitude and envelope modulation
+ * 5. Outputs I/Q samples via AXI-Stream interface
+ * 
+ * Signal Generation Pipeline:
+ * - Phase accumulator with configurable frequency control word (FCW)
+ * - CORDIC-based sin/cos generation (configurable latency)
+ * - Envelope BRAM for amplitude shaping
+ * - Multiplier pipeline for gain and modulation
+ * - 16-bit saturation and I/Q packing
+ * 
+ * Control FSM States:
+ * - IDLE: Waiting for pulse trigger
+ * - WAIT_DELAY: Counting down to start time
+ * - PLAY: Actively generating samples
+ * - DRAIN: Flushing pipeline after completion
+ * 
+ * Key Features:
+ * - Configurable bit widths for all parameters
+ * - Pipeline latency compensation
+ * - AXI-Stream backpressure handling
+ * - Automatic pipeline draining
+ * - Envelope-based amplitude modulation
+ * 
+ * @param PHASE_W         Phase accumulator bit width
+ * @param FREQ_W          Frequency control word bit width
+ * @param AMP_W           Amplitude bit width
+ * @param TLEN_W          Pulse length bit width
+ * @param TSTART_W        Start time bit width
+ * @param ENVELOPE_ADDR_W Envelope memory address width
+ * @param CORDIC_W        CORDIC output bit width (default 16)
+ * @param CORDIC_LATENCY  CORDIC pipeline latency (default 16)
+ * @param clk             System clock
+ * @param rst_n           Active-low reset
+ * @param pulse_ready     Pulse trigger signal
+ * @param pulse_frequency Frequency control word
+ * @param pulse_phase     Initial phase offset
+ * @param pulse_amplitude Global amplitude gain
+ * @param pulse_t_start   Start time delay
+ * @param pulse_t_len     Pulse duration in samples
+ * @param pulse_envelope_addr Envelope memory base address
+ * @param m_axis_tdata    AXI-Stream data output (32-bit I/Q)
+ * @param m_axis_tvalid   AXI-Stream valid signal
+ * @param m_axis_tready   AXI-Stream ready signal
+ */
 module pulse_engine #(
     // Widths from header macros
     parameter int PHASE_W          = `PULSE_REG_PHASE_W,

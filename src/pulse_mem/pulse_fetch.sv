@@ -1,3 +1,38 @@
+/**
+ * Pulse Fetch Module
+ * 
+ * Retrieves pulse parameters from pulse memory based on addresses provided by
+ * the RISC-V core. This module acts as a memory interface that translates
+ * pulse memory addresses into actual pulse parameters for the generation pipeline.
+ * 
+ * Operation:
+ * 1. Receives pulse_descriptor with memory address and delay information
+ * 2. Fetches the corresponding pulse instruction from pulse memory
+ * 3. Extracts individual parameters (frequency, phase, amplitude, etc.)
+ * 4. Combines memory data with delay information for timing control
+ * 
+ * Memory Interface:
+ * - 32-entry pulse memory (5-bit addressing)
+ * - Each entry contains complete pulse parameters
+ * - Delay (t_start) comes from the descriptor, not memory
+ * - Memory is read synchronously on valid descriptor
+ * 
+ * Parameter Extraction:
+ * - Uses bit-field macros to extract parameters from memory words
+ * - Provides clean parameter interface to downstream modules
+ * - Supports configurable bit widths via header macros
+ * 
+ * @param clk                System clock
+ * @param rst_n              Active-low reset
+ * @param pulse_descriptor   Pulse descriptor with address and delay
+ * @param pulse_descriptor_valid Valid signal for descriptor
+ * @param frequency          Extracted frequency parameter
+ * @param phase             Extracted phase parameter
+ * @param amplitude         Extracted amplitude parameter
+ * @param t_start           Start time (from descriptor delay)
+ * @param t_len             Extracted length parameter
+ * @param envelope_addr     Extracted envelope address
+ */
 module pulse_fetch (
     input logic clk,
     input logic rst_n,
