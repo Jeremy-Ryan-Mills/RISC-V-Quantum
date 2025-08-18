@@ -5,7 +5,6 @@ module pulse_scheduler (
     input pulse_descriptor_t pulse_descriptor, // Pulse instruction from the RISC-V core
     input logic pulse_descriptor_valid,
 
-    output logic [31:0] counter,
     output logic [31:0] m_axis_tdata,
     output logic        m_axis_tvalid,
     input  logic        m_axis_tready
@@ -100,15 +99,6 @@ module pulse_scheduler (
         .m_axis_tvalid(m_axis_tvalid),
         .m_axis_tready(m_axis_tready)
     );
-
-
-    counter counter_inst (
-        .clk(clk),
-        .rst_n(rst_n),
-        .count_out(count_out)
-    );
-
-    assign counter = count_out;
 
 
 endmodule

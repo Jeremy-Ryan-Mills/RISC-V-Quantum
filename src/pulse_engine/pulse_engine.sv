@@ -1,5 +1,5 @@
 module pulse_engine #(
-    // Widths pulled from your header macros
+    // Widths from header macros
     parameter int PHASE_W          = `PULSE_REG_PHASE_W,
     parameter int FREQ_W           = `PULSE_REG_FREQ_W,
     parameter int AMP_W            = `PULSE_REG_AMP_W,
@@ -9,7 +9,7 @@ module pulse_engine #(
 
     // Numerics
     parameter int CORDIC_W         = 16,     // sin/cos output (Q1.15)
-    parameter int CORDIC_LATENCY   = 16      // set to your actual core latency
+    parameter int CORDIC_LATENCY   = 16      // core latency
 ) (
     input  logic                         clk,
     input  logic                         rst_n,
@@ -32,9 +32,7 @@ module pulse_engine #(
     // axi_if_pkg::axis32_m m_axis
 );
 
-    // ================================================================
     // Snapshot registers
-    // ================================================================
     logic [FREQ_W-1:0]           fcw_r;
     logic [PHASE_W-1:0]          phase0_r;
     logic [AMP_W-1:0]            amp_r;
@@ -42,10 +40,8 @@ module pulse_engine #(
     logic [TLEN_W-1:0]           tlen_r;
     logic [ENVELOPE_ADDR_W-1:0]  env_base_r;
 
-    // ================================================================
     // Control FSM
     // IDLE -> WAIT_DELAY -> PLAY -> DRAIN (to flush pipeline)
-    // ================================================================
     typedef enum logic [1:0] {IDLE, WAIT_DELAY, PLAY, DRAIN} state_t;
     state_t state, state_n;
 
@@ -57,12 +53,11 @@ module pulse_engine #(
     logic adv;  // one sample advances through the output stage
     assign adv = m_axis_tready;
 
-    // Total fixed pipeline latency from “index asserted” to “sample valid”
+    // Total fixed pipeline latency from "index asserted" to "sample valid"
     localparam int BRAM_LAT = 1;
     localparam int PIPE_LAT = BRAM_LAT + CORDIC_LATENCY;
 
-    // We’ll assert tvalid only during PLAY/DRAIN when the pipeline actually produces data
-    // Keep a shift register of valids to model pipeline latency.
+    // Keep a shift register of valids to model pipeline latency
     logic [PIPE_LAT:0] valid_sr;  // [0] = newest stage
 
     // Snapshot on trigger
@@ -144,15 +139,13 @@ module pulse_engine #(
         end
     end
 
-    // ================================================================
     // Phase accumulator (DDS)
-    // ================================================================
     logic [PHASE_W-1:0] phase_acc;
     logic               nco_adv;
 
-    // Advance the NCO only when we’re feeding a new sample into the pipeline.
-    // During PLAY we advance every accepted sample (adv).
-    // During WAIT_DELAY we hold; during DRAIN we hold.
+    // Advance the NCO only when we're feeding a new sample into the pipeline
+    // During PLAY we advance every accepted sample (adv)
+    // During WAIT_DELAY we hold; during DRAIN we hold
     assign nco_adv = (state == PLAY) && adv;
 
     always_ff @(posedge clk or negedge rst_n) begin
@@ -165,12 +158,10 @@ module pulse_engine #(
         end
     end
 
-    // ================================================================
     // CORDIC (sin/cos), assumed fully pipelined with CORDIC_LATENCY
-    // ================================================================
     logic signed [CORDIC_W-1:0] sin_i, sin_q;
 
-    // Replace with your vendor IP / custom CORDIC
+    // Replace with custom CORDIC? TODO: Look into this for vivado
     // cordic_sincos #(.W(PHASE_W), .OUT_W(CORDIC_W), .LAT(CORDIC_LATENCY)) cordic_inst (
     //     .clk   (clk),
     //     .rst_n (rst_n),
@@ -179,9 +170,8 @@ module pulse_engine #(
     //     .cos_o (sin_q)
     // );
 
-    // ================================================================
     // Envelope BRAM (single-port, synchronous read -> 1-cycle latency)
-    // ================================================================
+    // TODO: look into how to load into this BRAM
     (* ram_style = "block" *)
     logic signed [AMP_W-1:0] env_bram [0:(1<<ENVELOPE_ADDR_W)-1];
 
@@ -197,10 +187,8 @@ module pulse_engine #(
         end
     end
 
-    // ================================================================
     // Pipeline alignment: delay control/valid through PIPE_LAT
-    // ================================================================
-    // valid_sr shifts in “we just launched a PLAY sample” flags
+    // valid_sr shifts in "we just launched a PLAY sample" flags
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             valid_sr <= '0;
@@ -232,11 +220,9 @@ module pulse_engine #(
         end
     end
 
-    // ================================================================
     // Multiply & scale: (amp * env) * sin/cos  -> saturate to 16-bit
     // Assume amp/env are signed Q1.(AMP_W-1), sin/cos Q1.15
     // Product widths: AMP_W + AMP_W + 16
-    // ================================================================
     localparam int PROD1_W = AMP_W + AMP_W;          // amp * env
     localparam int PROD_W  = PROD1_W + CORDIC_W;     // * sin/cos
 
@@ -277,9 +263,7 @@ module pulse_engine #(
         iq_packed = { sat16(q_prod), sat16(i_prod) }; // {Q,I}
     end
 
-    // ================================================================
     // AXI-Stream outputs
-    // ================================================================
     // tvalid follows the delayed valid_sr tail; data is stable when tvalid=1.
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
@@ -292,7 +276,6 @@ module pulse_engine #(
                     m_axis_tdata <= iq_packed;
                 end
             end
-            // If !adv, we hold tvalid/data (AXI backpressure)
         end
     end
 
