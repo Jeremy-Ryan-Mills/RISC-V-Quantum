@@ -5,7 +5,10 @@ module pulse_scheduler (
     input pulse_descriptor_t pulse_descriptor, // Pulse instruction from the RISC-V core
     input logic pulse_descriptor_valid,
 
-    output logic [31:0] counter
+    output logic [31:0] counter,
+    output logic [31:0] m_axis_tdata,
+    output logic        m_axis_tvalid,
+    input  logic        m_axis_tready
 
 );
 
@@ -79,7 +82,7 @@ module pulse_scheduler (
         .empty(empty)
     );
 
-    axis32_t m_axis;
+
 
     // Need to create a pulse_engine module
     // TODO: Debug the pulse engine module, and figure out if it is playing something to the AXI master
@@ -93,7 +96,9 @@ module pulse_scheduler (
         .pulse_t_start(t_start_trig),
         .pulse_t_len(t_len_trig),
         .pulse_envelope_addr(envelope_addr_trig),
-        .m_axis(m_axis)
+        .m_axis_tdata(m_axis_tdata),
+        .m_axis_tvalid(m_axis_tvalid),
+        .m_axis_tready(m_axis_tready)
     );
 
 
