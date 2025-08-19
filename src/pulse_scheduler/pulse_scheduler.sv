@@ -35,8 +35,10 @@ module pulse_scheduler (
 
     output logic [31:0] m_axis_tdata,
     output logic        m_axis_tvalid,
-    input  logic        m_axis_tready
+    input  logic        m_axis_tready,
 
+    output logic pulse_register_full,
+    output logic pulse_register_empty
 );
 
     // Pulse Fetch from Memory

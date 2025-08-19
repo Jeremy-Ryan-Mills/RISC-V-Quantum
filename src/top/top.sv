@@ -39,6 +39,9 @@ module top (
     logic        m_axis_tvalid;
     logic        m_axis_tready;
 
+    logic pulse_register_full;
+    logic pulse_register_empty;
+
     pulse_scheduler pulse_scheduler_inst (
         .clk(ps_clk),
         .rst_n(ps_rst_n),
@@ -46,7 +49,9 @@ module top (
         .pulse_descriptor_valid(~pulse_inst_fifo_empty),
         .m_axis_tdata(m_axis_tdata),
         .m_axis_tvalid(m_axis_tvalid),
-        .m_axis_tready(m_axis_tready)
+        .m_axis_tready(m_axis_tready),
+        .pulse_register_full(pulse_register_full),
+        .pulse_register_empty(pulse_register_empty)
     );
 
     dac_axi_master dac_axi_master_inst (
