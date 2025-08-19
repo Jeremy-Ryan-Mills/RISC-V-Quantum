@@ -1,3 +1,11 @@
+/*
+This module handles quantum instructions in the execute stage.
+- If the instruction is QPULSE, it will output a valid pulse descriptor if the pulse register is not full
+- If the instruction is QDELAY, it will set the delay counter
+- If the instruction is QWAIT_BUSY, it will set the qwait signal to 1
+- If the qwait signal is 1 and the pulse register is empty, the qwait signal will be set to 0
+- If the qdelay signal is not 0 and not set, it will be decremented by 1
+*/
 module quantum_handler (
     input logic clk,
     input logic reset,

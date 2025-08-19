@@ -224,6 +224,8 @@ module core (
     logic [11:0] qdelay;
     logic qwait_busy;
 
+    // Quantum handler handles quantum instruction in the execute stage
+    // - Output signals that interface with pulse scheduler are driven here
     quantum_handler quantum_handler_inst (
         .clk(clk),
         .reset(reset),
