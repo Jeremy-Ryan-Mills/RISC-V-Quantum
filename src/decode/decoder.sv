@@ -26,6 +26,7 @@ module decoder (
             `OPCODE_LUI,
             `OPCODE_AUIPC:  imm = {instr[31:12], 12'b0}; // U-type
             `OPCODE_JAL:    imm = {{11{instr[31]}}, instr[31], instr[19:12], instr[20], instr[30:21], 1'b0}; // J-type
+            `OPCODE_QUANTUM: imm = {{20{instr[31]}}, instr[31:20]}; // Q-type
             default:        imm = 32'b0;
         endcase
     end

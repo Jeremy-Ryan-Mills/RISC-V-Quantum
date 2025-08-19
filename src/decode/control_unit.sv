@@ -127,6 +127,30 @@ module control_unit (
                 ctrl.wb_sel  = 2'b01;
             end
 
+            `OPCODE_QUANTUM: begin
+                case (funct3)
+                    `FUNCT3_QPULSE: begin
+                        ctrl.reg_wen = 1'b0;
+                    end
+                    `FUNCT3_QDELAY: begin
+                        ctrl.reg_wen = 1'b0;
+                    end
+                    `FUNCT3_QWAIT_BUSY: begin
+                        ctrl.reg_wen = 1'b0;
+                    end
+                    `FUNCT3_QGETT: begin
+                        ctrl.reg_wen = 1'b1;
+                        ctrl.wb_sel  = 2'b11; //TODO: Implement from pulse scheduler
+                    end
+                    `FUNCT3_QSETT: begin
+                        ctrl.reg_wen = 1'b0;
+                    end
+                    default: begin
+                        ctrl = '0;
+                    end
+                endcase
+            end
+
             default: begin
                 ctrl = '0;
             end

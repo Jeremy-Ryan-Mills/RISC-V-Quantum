@@ -9,8 +9,11 @@ module core (
     output logic [31:0] pc
 
     // Pulse instruction output to async fifo
-    //output pulse_descriptor_t pulse_descriptor,
-    //output logic pulse_descriptor_valid
+    output pulse_descriptor_t pulse_descriptor,
+    output logic pulse_descriptor_valid,
+
+    input logic pulse_register_full,
+    input logic pulse_register_empty
 );
 
     // ----------------------------
@@ -48,7 +51,6 @@ module core (
             if_id_pc    <= pc;
         end
     end
-
 
     // ----------------------------
     // DECODE stage

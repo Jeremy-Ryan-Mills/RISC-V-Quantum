@@ -24,7 +24,7 @@
 `define OPCODE_AUIPC    7'b0010111
 `define OPCODE_MISC_MEM 7'b0001111
 `define OPCODE_SYSTEM   7'b1110011
-`define OPCODE_QUANTUM    7'b0001011
+`define OPCODE_QUANTUM  7'b0001011
 
 // -----------------------------------------------------------------------------
 // funct3 fields (common)
@@ -47,6 +47,15 @@
 `define FUNCT3_BGE      3'b101
 `define FUNCT3_BLTU     3'b110
 `define FUNCT3_BGEU     3'b111
+
+// -----------------------------------------------------------------------------
+// funct3 fields for Quantum instructions
+// -----------------------------------------------------------------------------
+`define FUNCT3_QPULSE  3'b000
+`define FUNCT3_QDELAY  3'b001
+`define FUNCT3_QWAIT_BUSY  3'b010
+`define FUNCT3_QGETT  3'b011
+`define FUNCT3_QSETT  3'b100
 
 // -----------------------------------------------------------------------------
 // funct7 fields for OP
