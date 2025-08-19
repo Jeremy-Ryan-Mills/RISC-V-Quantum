@@ -19,23 +19,15 @@ The following are optimizations that were done on the RISC-V core:
 - The branch predictor currently being used is a 2-bit saturating predictor, but the module can be modified to accommodate for different types of branch predictors. Having the branch predictor in the decode stage will make the penalty for jump instructions only 1 cycle, and the penalty for mispredicted branches 2 cycles instead of the typical 3 cycles in a 5-stage pipeline.
 - Data forwarding is used to the EX stage from MEM/WB. If the MEM/WB stage is writing to a register that is being used in EX, there is a mux that will forward the data into the ALU/Branch comp module.
 
-## Block Diagram
-
-The block diagram for the RISC-V core is shown below.
-
-![block diagram](block_diagram.png "RISC-V Processor Block Diagram")
-
-The other half of the architecture is the pulse scheduler, which uses a faster clock. The two transfer data using an asynchronous FIFO for CDC.
-
 ## Pulse Scheduler
 
-The pulse scheduler is the component of the architecture that takes care of triggering pulses when they are loaded via an instruction from the RISC-V core. When a quantum pulse instruction is executed in the RISC-V core, the information will be submitted to an asynchronous FIFO, which will be accessed by the pulse scheduler. When the pulse scheduler gets the address and start time of the pulse, it will retrieve the parameters and load it into the pulse FIFO. The pulse FIFO will decrement the start time of every pulse, and will pop the first pulse when its delay is zero.
+The pulse scheduler is the component of the architecture that takes care of triggering pulses when they are loaded via an instruction from the RISC-V core. When a quantum pulse instruction is executed in the RISC-V core, the pulse descriptor (QMEM and delay immediate) will be submitted to an asynchronous FIFO, which will be accessed by the pulse scheduler. When the pulse scheduler gets the address and start time of the pulse, it will retrieve the parameters and load it into the pulse register, which is a FIFO. The pulse FIFO will decrement the start time of every pulse, and will pop the first pulse when its delay is zero.
 
-Once the pulse is popped from the FIFO, it will be sent to the pulse engine, to send data to the RFSoC's DAC for pulse generation.
+Once the pulse is popped from the FIFO, it will be sent to the pulse engine, to send data to the RFSoC's DAC for pulse generation. The pulse engine calculates the I/Q data of the pulse using CORDIC and transmits the data to the DAC using an AXI4-Stream master module.
 
-## Pulse Memory
+### Pulse Memory
 
-This is the format of pulse descriptor words in memory. These words will be loaded in when a program is compiled and instructions/memory is loaded into the design.
+This is the format of pulse words in memory. These words will be loaded in when a program is compiled and instructions/memory is loaded into the design.
 
 | **Field**  | **Bit Range (msb\:lsb)** | **Width (bits)** | **Description**                                                                |
 | ---------- | ------------------------ | ---------------- | ------------------------------------------------------------------------------ |
@@ -47,9 +39,11 @@ This is the format of pulse descriptor words in memory. These words will be load
 | `env_addr` | **95 : 80**            | 16 bits            | Address of Envelope in Memory |
 | *reserved* | **127 : 96**            | 32 bits           | Future use (flags, CRC, channel ID, etc.).                                     |
 
-## Quantum ISA Extension Summary
+In a quantum instruction that queues a pulse, a memory address of the pulse word will be provided from a register on the RISC-V core. The instruction will also specify a delay in clock cycles until the pulse is triggered.
 
-These are the quantum instructions that are supported in the RISC-V processor. 
+### Quantum ISA Extension Summary
+
+These are the quantum instructions that are supported in the RISC-V processor:
 
 | Instruction                 | Format                                                     | Purpose                                                                                                         | Result                   | Notes                                                       |
 | --------------------------- | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ------------------------ | ----------------------------------------------------------- |
@@ -59,7 +53,6 @@ These are the quantum instructions that are supported in the RISC-V processor.
 | **`QGETT rd`**              | *I-type* (`opcode 0x0B`, `funct3 011`, imm=0, `rs1`=0)     | Read the **32 bits** of the scheduler time-counter into `rd`.                                               | counter value            | Pipeline stalls until value is returned.                    |
 | **`QSETT rs1`**             | *I-type* (`opcode 0x0B`, `funct3 100`, imm=0, `rd`=0)      | Overwrite the scheduler time-counter with **`rs1`**.                                                            | none                     | Stalls until acknowledge; use to reset or load a base time. |
 
-
 | Bits 31-25  | 24-20      | 19-15     | 14-12   | 11-7     | 6-0         | Operation                                          |
 | ----------- | ---------- | --------- | ------- | -------- | ----------- | -------------------------------------------------- |
 | `imm[11:5]` | `imm[4:0]` | **`rs1`** | **000** | **`rd`** | **0001011** | **`QPULSE`** – enqueue `rs1` with δ = `imm[11:0]`. |
@@ -67,6 +60,16 @@ These are the quantum instructions that are supported in the RISC-V processor.
 | `0000000`   | `00000`    | `00000`   | **010** | `00000`  | **0001011** | **`QWAIT_BUSY`** – block until FIFO empty.         |
 | `0000000`   | `00000`    | `00000`   | **011** | **`rd`** | **0001011** | **`QGETT`** – read counter into `rd`.              |
 | `0000000`   | **`rs1`**  | `00000`   | **100** | `00000`  | **0001011** | **`QSETT`** – write counter from `rs1`.            |
+
+The `QPULSE` instruction streams the pulse descriptors to the pulse scheduler with an asynchronous FIFO for proper Clock Domain Crossing. `QWAIT_BUSY` and `QSETT` instructions are also handled with the asynchronous FIFO. The pulse scheduler exposes the FIFO full and empty signals with double flip-flop synchronizers for the `QGETT` instruction.
+
+## Block Diagrams
+
+The block diagram for the RISC-V core is shown below.
+
+![block diagram](block_diagram.png "RISC-V Processor Block Diagram")
+
+The other half of the architecture is the pulse scheduler, which uses a faster clock. The two transfer data using an asynchronous FIFO for CDC.
 
 ## Tesbenches
 
