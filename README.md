@@ -4,23 +4,20 @@ This is a RISC-V processor project with an extended instruction set for supercon
 
 The project in Vivado can be build with `./scripts/create_core_project.sh`. Currently, I have completed the RISC-V core, so that is what the script will build. I am working on the gateware for the high frequency pulse scheduler. Additionally, I do not have access to an RFSoC currently, so the RISC-V core is built for a **Xilinx PYNQ-Z1** development board, that contains a **Zynq 7000 SoC**. The specs for this development board can be found at this [link](https://digilent.com/reference/programmable-logic/pynq-z1/reference-manual?redirect=1).
 
-## Microarchitecture
+## RISC-V Core Microarchitecture
 
 This RISC-V processor has four pipelined stages:
 
 1. Instruction Fetch - Instructions are retreived from IMEM
 2. Instruction Decode - Instructions are decoded, registers are accessed, branch prediction is made
-3. Execution - Branch comparison is made and compared to branch prediction, registers are used in ALU operation
-4. MEM/WB - Memory is read/written to, and the writeback value is sent to the register file
+3. Execution - Branch comparison is made and compared to branch prediction, registers/ are used in ALU operation
+4. Memory/Writeback - Memory is read/written to, and the writeback value is sent to the register file
 
-The reasons for this style of pipeline are as follows:
-- Pipeline between address and memory read to make memory read combinational for instant writeback. This is synthesizable on Xilinx FPGAs, and is a way to reduce the memory latency without introducing more data hazards in a five stage pipelined processor.
-- Data forwarding is used to the EX stage from MEM/WB. If the MEM/WB stage is writing to a register that is being used in EX, there is a mux that will forward the data into the ALU/Branch comp module. 
-- Having the branch predictor in the decode stage will make the penalty for jump instructions only 1 cycle, and the penalty for mispredicted branches 2 cycles instead of the typical 3 cycles in a 5-stage pipeline. 
+The reason the memory and writeback stages are combined is because the memory reads are combinational for instant writeback. This is synthesizable on Xilinx FPGAs, and is a way to reduce the memory latency without introducing more data hazards in a five stage pipelined processor.
 
-## Tesbenches
-
-I am going to use Cocotb with a verilator backend to test the processor. All of the current test benches are for the RISC-V core (pulse scheduler is still in development). You can find the Cocotb tests in the `./sim/riscv` directory. The tests can be ran by calling `make` in that directory.
+The following are optimizations that were done on the RISC-V core:
+- The branch predictor currently being used is a 2-bit saturating predictor, but the module can be modified to accommodate for different types of branch predictors. Having the branch predictor in the decode stage will make the penalty for jump instructions only 1 cycle, and the penalty for mispredicted branches 2 cycles instead of the typical 3 cycles in a 5-stage pipeline.
+- Data forwarding is used to the EX stage from MEM/WB. If the MEM/WB stage is writing to a register that is being used in EX, there is a mux that will forward the data into the ALU/Branch comp module.
 
 ## Block Diagram
 
@@ -70,6 +67,10 @@ These are the quantum instructions that are supported in the RISC-V processor.
 | `0000000`   | `00000`    | `00000`   | **010** | `00000`  | **0001011** | **`QWAIT_BUSY`** – block until FIFO empty.         |
 | `0000000`   | `00000`    | `00000`   | **011** | **`rd`** | **0001011** | **`QGETT`** – read counter into `rd`.              |
 | `0000000`   | **`rs1`**  | `00000`   | **100** | `00000`  | **0001011** | **`QSETT`** – write counter from `rs1`.            |
+
+## Tesbenches
+
+To verify the RISC-V core and pulse scheduler, I use Cocotb with a verilator backend to test the processor. All of the current test benches are for the RISC-V core (pulse scheduler is still in development). You can find the Cocotb tests in the `./sim/riscv` directory. The tests can be ran by calling `make` in that directory. In the future, I will add Cocotb tests for the pulse scheduler and integration tests for the top module.
 
 ## To-Do:
 
