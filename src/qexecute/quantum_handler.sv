@@ -23,7 +23,7 @@ module quantum_handler (
                     `FUNCT3_QPULSE: begin
                         pulse_descriptor.pulse_mem_addr <= rv1;
                         pulse_descriptor.delay <= instr[31:20];
-                        pulse_descriptor_valid <= 1;
+                        pulse_descriptor_valid <= ~pulse_register_full;
                         qwait_busy <= qwait_busy & ~pulse_register_empty;
                         if (qdelay != 12'd0) begin
                             qdelay <= qdelay - 12'd1;

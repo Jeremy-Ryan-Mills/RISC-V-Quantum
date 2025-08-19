@@ -228,6 +228,7 @@ module core (
         .clk(clk),
         .reset(reset),
         .instr(id_ex_instr),
+        .rv1(id_ex_rv1),
         .pulse_descriptor(pulse_descriptor),
         .pulse_descriptor_valid(pulse_descriptor_valid),
         .qdelay(qdelay),
