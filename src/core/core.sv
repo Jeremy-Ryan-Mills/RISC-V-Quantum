@@ -43,7 +43,7 @@ module core (
     logic        id_flush;     // Enable flush for ID -> EX Pipeline
 
     always_ff @(posedge clk or posedge reset) begin
-        if (reset || if_flush) begin
+        if (reset || if_flush || qwait_busy || qdelay != 12'd0) begin
             if_id_instr <= 32'h00000013; // NOP
             if_id_pc    <= 32'd0;
         end else begin
@@ -78,25 +78,6 @@ module core (
         .imm(imm),
         .ctrl(ctrl)
     );
-
-    // Ouput pulse instruction if it is a pulse instruction
-    /*
-    always_comb begin
-        if (if_id_instr[6:0] == `OPCODE_QUANTUM) begin
-            pulse_descriptor = '{
-                delay: imm,
-                pulse_mem_addr: rs1
-            };
-            pulse_descriptor_valid = 1'b1;
-        end else begin
-            pulse_descriptor = '{
-                delay: `PULSE_REG_TSTART_W'd0,
-                pulse_mem_addr: `PULSE_MEM_ADDR_W'd0
-            };
-            pulse_descriptor_valid = 1'b0;
-        end
-    end
-    */
 
     logic [31:0] id_rs1_for_jump;
     assign id_rs1_for_jump =
@@ -162,7 +143,7 @@ module core (
     logic [31:0] id_ex_predicted_pc;
 
     always_ff @(posedge clk or posedge reset) begin
-        if (reset || id_flush) begin
+        if (reset || id_flush || qwait_busy || qdelay != 12'd0) begin
             id_ex_pc   <= 32'd0;
             id_ex_instr <= 32'h00000013; // NOP
             id_ex_rv1  <= 32'd0;
@@ -237,6 +218,23 @@ module core (
         .branch_taken(branch_taken)
     );
 
+    // ----------------------------
+    // QUANTUM HANDLER
+    // ----------------------------
+    logic [11:0] qdelay;
+    logic qwait_busy;
+
+    quantum_handler quantum_handler_inst (
+        .clk(clk),
+        .reset(reset),
+        .instr(id_ex_instr),
+        .pulse_descriptor(pulse_descriptor),
+        .pulse_descriptor_valid(pulse_descriptor_valid),
+        .qdelay(qdelay),
+        .qwait_busy(qwait_busy),
+        .pulse_register_full(pulse_register_full),
+        .pulse_register_empty(pulse_register_empty)
+    );
 
 
     // ----------------------------
@@ -254,7 +252,7 @@ module core (
     control_signals_t ex_mem_ctrl;
 
     always_ff @(posedge clk or posedge reset) begin
-        if (reset) begin
+        if (reset || qwait_busy || qdelay != 12'd0) begin
             ex_mem_pc   <= 32'd0;
             ex_mem_alu_out <= 32'd0;
             ex_mem_rv2  <= 32'd0;
